@@ -40,12 +40,33 @@
   /*
     Consistent line weight for the internal geometry.
   */
-  --line-width: 3px;
+  --line-width: 0px;
 
   /*
     Content width independent of framing width.
   */
   --content-max-width: 1080px;
+
+  /*
+    One nested ray consists of its top border plus its gap.
+    The landing begins beneath four of these nested rays.
+  */
+  --frame-step:
+    calc(var(--ray-gap) + var(--line-width));
+
+  /*
+    Distance from the top of the viewport to the beginning
+    of the yellow landing field:
+    outer border + Contact + Listen + About + Gigs rays.
+  */
+  --landing-top-offset:
+    calc(
+      var(--outer-border-width)
+      + var(--frame-step)
+      + var(--frame-step)
+      + var(--frame-step)
+      + var(--frame-step)
+    );
 }
 
 
@@ -106,11 +127,9 @@ button {
 .page-shell {
   width: 100%;
 
-  padding:
-    clamp(10px, 2vw, 28px);
+  padding: 0;
 
-  background:
-    var(--page-background);
+  background: var(--ink);
 }
 
 
@@ -155,9 +174,9 @@ button {
   becoming dependent on one particular frame's dimensions.
 */
 .q-mark {
-  position: absolute;
+  position: fixed;
 
-  z-index: 20;
+  z-index: 40;
 
   top: 10px;
   left: 50%;
@@ -192,21 +211,256 @@ button {
 }
 
 
+/*
+  Persistent horizontal shelf directly beneath the Q.
+
+  JavaScript measures the actual bottom edge of the Q and
+  positions this line there, so changes to Q size or responsive
+  behavior do not require recalculating the shelf manually.
+
+  The line spans the full viewport. Against the black outer
+  field, the portions beyond the site frame visually disappear,
+  creating one continuous structural edge.
+*/
+.q-shelf {
+  position: fixed;
+
+  z-index: 35;
+
+  top: 0;
+  left: 0;
+
+  width: 100vw;
+  height: 0;
+
+  pointer-events: none;
+}
+
+
 /* ============================================================
-   FUTURE STICKY NAVIGATION
+   PERSISTENT STACKING NAVIGATION
    ============================================================ */
 
 
 /*
-  Intentionally hidden during this first build.
+  This is now the entire persistent top crown rather than four
+  isolated horizontal strips.
 
-  DO NOT DELETE.
+  JavaScript sets its exact height to the Q shelf.
 
-  This is where the progressive "Quaternity / Gigs / About /
-  Listen / Contact collect at the top" system will live.
+  The black background guarantees that scrolling page content
+  can never show through the header.
+*/
+.sticky-rays {
+  position: fixed;
+
+  top: 0;
+  left: 0;
+
+  z-index: 25;
+
+  width: 100vw;
+  height: 0;
+
+  overflow: hidden;
+
+  background:
+    var(--ink);
+
+  pointer-events: none;
+}
+
+
+/*
+  Each ray is now a full nested field extending from its
+  original top position all the way down to the Q shelf.
+
+  Because the later/narrower elements paint over the earlier
+  wider elements, they recreate the nested frame geometry.
+*/
+.sticky-ray {
+  position: absolute;
+
+  border-top:
+    var(--line-width)
+    solid
+    var(--ink);
+
+  border-right:
+    var(--line-width)
+    solid
+    var(--ink);
+
+  border-left:
+    var(--line-width)
+    solid
+    var(--ink);
+
+  pointer-events: none;
+}
+
+
+.sticky-ray-contact {
+  background:
+    var(--contact-frame);
+}
+
+
+.sticky-ray-listen {
+  background:
+    var(--listen-frame);
+}
+
+
+.sticky-ray-about {
+  background:
+    var(--about-frame);
+}
+
+
+.sticky-ray-gigs {
+  background:
+    var(--gigs-frame);
+}
+
+
+/*
+  The innermost fixed yellow field duplicates the visible top
+  portion of the original landing area.
+
+  This is what prevents blue or scrolling page content from
+  appearing inside the Gigs frame beneath the nested rays.
+*/
+.sticky-crown-core {
+  position: absolute;
+
+  background:
+    var(--content-background);
+
+  pointer-events: none;
+}
+
+
+
+
+
+/*
+  The navigation container covers the viewport but does not
+  intercept mouse input.
+
+  Individual sticky items become interactive only when they
+  have actually joined the visible stack.
 */
 .sticky-stack {
-  display: none;
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 30;
+
+  pointer-events: none;
+}
+
+
+/*
+  Each sticky item receives its exact top, left, and width from
+  JavaScript.
+
+  Its width and horizontal position are measured from the
+  original gate it represents, preserving the nested geometry
+  without hard-coded duplicate dimensions.
+*/
+.sticky-item {
+  position: fixed;
+
+  display: flex;
+
+  min-height: 36px;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 0;
+
+  visibility: hidden;
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  font-size:
+    clamp(1rem, 1.8vw, 1.25rem);
+
+  font-weight: 700;
+
+  line-height: 1;
+}
+
+
+/*
+  JavaScript adds this class precisely when the corresponding
+  original gate reaches its assigned position in the stack.
+*/
+.sticky-item.is-active {
+  visibility: visible;
+
+  opacity: 1;
+
+  pointer-events: auto;
+}
+
+
+/*
+  Quaternity uses the same three-column structure as the
+  original landing-page brand bar.
+
+  JavaScript copies the original contents into this element,
+  including the social links.
+*/
+.sticky-item-brand {
+  display: grid;
+
+  grid-template-columns:
+    1fr auto 1fr;
+
+  min-height: 42px;
+
+  align-items: center;
+
+  padding-inline:
+    clamp(12px, 3vw, 36px);
+
+  background:
+    var(--content-background);
+
+  font-size:
+    clamp(1rem, 2vw, 1.4rem);
+
+  font-weight: 600;
+}
+
+
+.sticky-item-gigs {
+  background:
+    var(--gigs-frame);
+}
+
+
+.sticky-item-about {
+  background:
+    var(--about-frame);
+}
+
+
+.sticky-item-listen {
+  background:
+    var(--listen-frame);
+}
+
+
+.sticky-item-contact {
+  background:
+    var(--contact-frame);
 }
 
 
@@ -293,8 +547,16 @@ button {
 .landing {
   display: flex;
 
+  /*
+    Fill exactly the portion of the first viewport remaining
+    beneath the nested ray tops.
+
+    Result:
+    the Quaternity strip lands at the bottom of the first
+    viewport and the Gigs gate begins below the fold.
+  */
   min-height:
-    clamp(500px, 68svh, 760px);
+    calc(100svh - var(--landing-top-offset));
 
   flex-direction: column;
 
@@ -323,9 +585,16 @@ button {
     clamp(8px, 2vw, 22px);
 
   padding:
-    clamp(80px, 10vw, 130px)
+    clamp(60px, 8vw, 100px)
     clamp(14px, 5vw, 80px)
-    clamp(40px, 6vw, 80px);
+    clamp(24px, 4vw, 48px);
+
+  /*
+    Slight optical lift without changing the actual document
+    geometry or the position of the Quaternity anchor below.
+  */
+  transform:
+    translateY(-18px);
 }
 
 
@@ -405,12 +674,17 @@ button {
   its position will trigger the first sticky navigation state.
 */
 .brand-gate {
-  display: flex;
+  display: grid;
 
-  min-height: 36px;
+  grid-template-columns:
+    1fr auto 1fr;
+
+  min-height: 42px;
 
   align-items: center;
-  justify-content: center;
+
+  padding-inline:
+    clamp(12px, 3vw, 36px);
 
   border-top:
     var(--line-width)
@@ -424,6 +698,40 @@ button {
     clamp(1rem, 2vw, 1.4rem);
 
   font-weight: 600;
+}
+
+
+.brand-name {
+  grid-column: 2;
+
+  text-align: center;
+}
+
+
+.brand-social {
+  font-size:
+    clamp(0.7rem, 1.2vw, 0.9rem);
+
+  font-weight: 700;
+
+  letter-spacing:
+    0.08em;
+
+  text-transform: uppercase;
+}
+
+
+.brand-social-youtube {
+  grid-column: 1;
+
+  justify-self: start;
+}
+
+
+.brand-social-instagram {
+  grid-column: 3;
+
+  justify-self: end;
 }
 
 
@@ -783,7 +1091,7 @@ button {
   :root {
     --outer-border-width: 5px;
     --ray-gap: 6px;
-    --line-width: 2px;
+    --line-width: 0px;
   }
 
 
@@ -803,11 +1111,6 @@ button {
     width: 68px;
 
     border-width: 4px;
-  }
-
-
-  .landing {
-    min-height: 560px;
   }
 
 

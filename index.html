@@ -26,33 +26,131 @@
           This intentionally lives OUTSIDE the nested frames so the
           finished artwork can sit across all of the rays.
         -->
-        <div class="q-mark" aria-hidden="true">
+        <a
+          class="q-mark"
+          href="#top"
+          aria-label="Back to top"
+        >
           Q
+        </a>
+
+
+        <!--
+          PERSISTENT Q SHELF
+
+          This fixed horizontal line sits directly beneath the Q
+          and spans the entire viewport.
+
+          The Q sits above it visually, so the shelf appears to
+          pass behind the emblem and continue uninterrupted toward
+          both sides of the screen.
+        -->
+        <div
+          class="q-shelf"
+          aria-hidden="true"
+        ></div>
+
+
+        <!--
+          PERSISTENT HEADER CROWN
+
+          Everything inside this element is fixed.
+
+          It reconstructs the original nested top geometry as a
+          permanent header:
+
+          black outer field
+          → Contact
+          → Listen
+          → About
+          → Gigs
+          → yellow landing center
+
+          Nothing from the scrolling document can show through it.
+        -->
+        <div
+          class="sticky-rays"
+          aria-hidden="true"
+        >
+          <div
+            class="sticky-ray sticky-ray-contact"
+            data-sticky-ray-for="contact"
+          ></div>
+
+          <div
+            class="sticky-ray sticky-ray-listen"
+            data-sticky-ray-for="listen"
+          ></div>
+
+          <div
+            class="sticky-ray sticky-ray-about"
+            data-sticky-ray-for="about"
+          ></div>
+
+          <div
+            class="sticky-ray sticky-ray-gigs"
+            data-sticky-ray-for="gigs"
+          ></div>
+
+          <div
+            class="sticky-crown-core"
+          ></div>
         </div>
 
 
         <!--
-          FUTURE STICKY NAVIGATION
+          PERSISTENT STACKING NAVIGATION
 
-          Do not remove this.
+          These elements are fixed-position copies of the original
+          Quaternity and section gates.
 
-          It is hidden for now. Later, when the original Quaternity,
-          Gigs, About, Listen, and Contact labels reach the top of the
-          viewport, JavaScript will progressively reveal their matching
-          items here.
+          JavaScript reveals them progressively as their original
+          counterparts reach the top navigation area.
 
-          Keeping this separate prevents the nested framing geometry
-          from fighting CSS sticky positioning.
+          Their horizontal position and width are measured from the
+          original gates, so the nested frame geometry remains the
+          source of truth.
         -->
         <nav
           class="sticky-stack"
           aria-label="Persistent section navigation"
         >
-          <a href="#top" data-sticky-for="brand">Quaternity</a>
-          <a href="#gigs" data-sticky-for="gigs">Gigs</a>
-          <a href="#about" data-sticky-for="about">About</a>
-          <a href="#listen" data-sticky-for="listen">Listen</a>
-          <a href="#contact" data-sticky-for="contact">Contact</a>
+          <div
+            class="sticky-item sticky-item-brand"
+            data-sticky-for="brand"
+          ></div>
+
+          <a
+            class="sticky-item sticky-item-gigs"
+            href="#gigs"
+            data-sticky-for="gigs"
+          >
+            Gigs
+          </a>
+
+          <a
+            class="sticky-item sticky-item-about"
+            href="#about"
+            data-sticky-for="about"
+          >
+            About
+          </a>
+
+          <a
+            class="sticky-item sticky-item-listen"
+            href="#listen"
+            data-sticky-for="listen"
+          >
+            Listen
+          </a>
+
+          <a
+            class="sticky-item sticky-item-contact"
+            href="#contact"
+            data-sticky-for="contact"
+          >
+            Contact
+          </a>
         </nav>
 
 
@@ -135,7 +233,34 @@
                     class="brand-gate"
                     data-gate="brand"
                   >
-                    Quaternity
+
+                    <!--
+                      Temporary text treatments.
+                      These can later become icons without changing this layout.
+
+                      Replace href="#" with the real channel/profile URLs once
+                      we're ready to wire the final social links.
+                    -->
+                    <a
+                      class="brand-social brand-social-youtube"
+                      href="#"
+                      aria-label="Quaternity on YouTube"
+                    >
+                      YouTube
+                    </a>
+
+                    <span class="brand-name">
+                      Quaternity
+                    </span>
+
+                    <a
+                      class="brand-social brand-social-instagram"
+                      href="#"
+                      aria-label="Quaternity on Instagram"
+                    >
+                      Instagram
+                    </a>
+
                   </div>
 
                 </header>
