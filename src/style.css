@@ -1,0 +1,868 @@
+@import "tailwindcss";
+
+
+/* ============================================================
+   QUATERNITY — FOUNDATION
+   ============================================================ */
+
+
+/*
+  These are prototype colors.
+
+  The important part is NOT the exact color.
+  The important part is that every structural layer has one
+  named variable.
+
+  Later we can change the entire palette here without hunting
+  through the rest of the stylesheet.
+*/
+
+:root {
+  --ink: #111111;
+
+  --page-background: #f5f0dc;
+  --content-background: #f7c917;
+
+  --gigs-frame: #8dd5e7;
+  --about-frame: #ff7b2c;
+  --listen-frame: #c8c8c8;
+  --contact-frame: #efe4a4;
+
+  --outer-border-width: 8px;
+
+  /*
+    Space between each nested frame.
+
+    This is what visually creates the colored "rays."
+  */
+  --ray-gap: 12px;
+
+  /*
+    Consistent line weight for the internal geometry.
+  */
+  --line-width: 3px;
+
+  /*
+    Content width independent of framing width.
+  */
+  --content-max-width: 1080px;
+}
+
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+
+html {
+  scroll-behavior: smooth;
+}
+
+
+body {
+  margin: 0;
+  min-width: 320px;
+
+  background: var(--page-background);
+  color: var(--ink);
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+
+/*
+  Prevent decorative framing from accidentally creating
+  horizontal browser scrolling.
+
+  We can revisit this when we intentionally design the
+  mobile "rays disappearing offscreen" behavior.
+*/
+body {
+  overflow-x: clip;
+}
+
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+
+button {
+  font: inherit;
+}
+
+
+/* ============================================================
+   PAGE SHELL
+   ============================================================ */
+
+
+.page-shell {
+  width: 100%;
+
+  padding:
+    clamp(10px, 2vw, 28px);
+
+  background:
+    var(--page-background);
+}
+
+
+/*
+  THIS is the permanent exterior shell.
+
+  The black border is only a placeholder.
+
+  When you create the real custom Quaternity border, we replace
+  THIS treatment without restructuring the rest of the page.
+*/
+.site-frame {
+  position: relative;
+
+  width: min(1240px, 100%);
+
+  margin-inline: auto;
+
+  border:
+    var(--outer-border-width)
+    solid
+    var(--ink);
+
+  background:
+    var(--content-background);
+
+  isolation: isolate;
+}
+
+
+/* ============================================================
+   Q / EMBLEM PLACEHOLDER
+   ============================================================ */
+
+
+/*
+  The Q lives independently of the nested frames.
+
+  That is deliberate.
+
+  Your final Q/emblem can therefore overlap every ray without
+  becoming dependent on one particular frame's dimensions.
+*/
+.q-mark {
+  position: absolute;
+
+  z-index: 20;
+
+  top: 10px;
+  left: 50%;
+
+  transform:
+    translateX(-50%);
+
+  display: grid;
+
+  width:
+    clamp(70px, 8vw, 100px);
+
+  aspect-ratio: 1;
+
+  place-items: center;
+
+  border:
+    5px solid
+    var(--ink);
+
+  border-radius: 50%;
+
+  background:
+    var(--content-background);
+
+  font-size:
+    clamp(2rem, 4vw, 3.25rem);
+
+  font-weight: 800;
+
+  line-height: 1;
+}
+
+
+/* ============================================================
+   FUTURE STICKY NAVIGATION
+   ============================================================ */
+
+
+/*
+  Intentionally hidden during this first build.
+
+  DO NOT DELETE.
+
+  This is where the progressive "Quaternity / Gigs / About /
+  Listen / Contact collect at the top" system will live.
+*/
+.sticky-stack {
+  display: none;
+}
+
+
+/* ============================================================
+   NESTED FRAME SYSTEM
+   ============================================================ */
+
+
+/*
+  THIS is the core of the entire design.
+
+  Each frame:
+
+  1. has its own color
+  2. has top / left / right borders
+  3. creates a small amount of internal space
+  4. contains everything that occurs BEFORE its named section
+
+  Because these are ordinary HTML containers, their height is
+  determined by whatever content exists inside them.
+
+  There is NO fixed frame artwork and NO predetermined height.
+*/
+.frame {
+  position: relative;
+
+  padding:
+    var(--ray-gap)
+    var(--ray-gap)
+    0;
+
+  border-top:
+    var(--line-width)
+    solid
+    var(--ink);
+
+  border-right:
+    var(--line-width)
+    solid
+    var(--ink);
+
+  border-left:
+    var(--line-width)
+    solid
+    var(--ink);
+
+  background:
+    var(--frame-color);
+}
+
+
+/*
+  Outermost to innermost.
+*/
+.frame-contact {
+  --frame-color:
+    var(--contact-frame);
+}
+
+
+.frame-listen {
+  --frame-color:
+    var(--listen-frame);
+}
+
+
+.frame-about {
+  --frame-color:
+    var(--about-frame);
+}
+
+
+.frame-gigs {
+  --frame-color:
+    var(--gigs-frame);
+}
+
+
+/* ============================================================
+   LANDING / OPENING COMPOSITION
+   ============================================================ */
+
+
+.landing {
+  display: flex;
+
+  min-height:
+    clamp(500px, 68svh, 760px);
+
+  flex-direction: column;
+
+  background:
+    var(--content-background);
+}
+
+
+/*
+  This is deliberately generous.
+
+  The Q sits above it and the four navigation columns occupy
+  the central visual field.
+*/
+.landing-nav {
+  display: grid;
+
+  flex: 1;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  align-items: center;
+
+  gap:
+    clamp(8px, 2vw, 22px);
+
+  padding:
+    clamp(80px, 10vw, 130px)
+    clamp(14px, 5vw, 80px)
+    clamp(40px, 6vw, 80px);
+}
+
+
+/*
+  Placeholder versions of your four vertical slabs.
+*/
+.nav-panel {
+  display: grid;
+
+  min-height:
+    clamp(260px, 34vw, 410px);
+
+  place-items: center;
+
+  border:
+    var(--line-width)
+    solid
+    var(--ink);
+
+  font-size:
+    clamp(0.9rem, 1.8vw, 1.25rem);
+
+  font-weight: 700;
+
+  letter-spacing:
+    0.12em;
+
+  transition:
+    transform 150ms ease;
+}
+
+
+.nav-panel:hover,
+.nav-panel:focus-visible {
+  transform:
+    translateY(-5px);
+}
+
+
+.nav-panel span {
+  writing-mode:
+    vertical-rl;
+
+  text-orientation:
+    upright;
+}
+
+
+.nav-panel-gigs {
+  background:
+    var(--gigs-frame);
+}
+
+
+.nav-panel-about {
+  background:
+    var(--about-frame);
+}
+
+
+.nav-panel-listen {
+  background:
+    var(--listen-frame);
+}
+
+
+.nav-panel-contact {
+  background:
+    var(--contact-frame);
+}
+
+
+/*
+  Quaternity sits at the bottom of the opening composition.
+
+  This is marked with data-gate="brand" in HTML because later
+  its position will trigger the first sticky navigation state.
+*/
+.brand-gate {
+  display: flex;
+
+  min-height: 36px;
+
+  align-items: center;
+  justify-content: center;
+
+  border-top:
+    var(--line-width)
+    solid
+    var(--ink);
+
+  background:
+    var(--content-background);
+
+  font-size:
+    clamp(1rem, 2vw, 1.4rem);
+
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   FRAME GATES / SECTION BANNERS
+   ============================================================ */
+
+
+/*
+  Every frame ends in one of these.
+
+  The negative horizontal margin makes the gate extend through
+  the frame's padding until it touches the frame's side rails.
+
+  That creates the visual effect of the vertical ray TURNING
+  inward and becoming the horizontal section banner.
+*/
+.frame-gate {
+  display: flex;
+
+  min-height: 36px;
+
+  align-items: center;
+  justify-content: center;
+
+  margin-inline:
+    calc(0px - var(--ray-gap));
+
+  border-top:
+    var(--line-width)
+    solid
+    var(--ink);
+
+  border-bottom:
+    var(--line-width)
+    solid
+    var(--ink);
+
+  background:
+    var(--frame-color);
+
+  font-size:
+    clamp(1rem, 1.8vw, 1.25rem);
+
+  font-weight: 700;
+
+  line-height: 1;
+}
+
+
+/* ============================================================
+   CONTENT SECTIONS
+   ============================================================ */
+
+
+/*
+  These sections deliberately have MINIMUM heights, not
+  fixed heights.
+
+  Delete content: they can contract to the minimum.
+
+  Add more content: they grow naturally.
+
+  This is the exact behavior we wanted from the frame system.
+*/
+.content-section {
+  position: relative;
+
+  padding:
+    clamp(52px, 7vw, 100px)
+    clamp(20px, 6vw, 86px);
+
+  background:
+    var(--content-background);
+
+  scroll-margin-top:
+    180px;
+}
+
+
+.section-gigs {
+  min-height: 620px;
+}
+
+
+.section-about {
+  min-height: 560px;
+}
+
+
+.section-listen {
+  min-height: 720px;
+}
+
+
+.section-contact {
+  min-height: 460px;
+}
+
+
+.section-inner {
+  width:
+    min(100%, var(--content-max-width));
+
+  margin-inline:
+    auto;
+}
+
+
+.prototype-label {
+  margin:
+    0 0 36px;
+
+  font-size:
+    clamp(1.6rem, 4vw, 3rem);
+
+  font-weight: 800;
+
+  letter-spacing:
+    0.04em;
+}
+
+
+/* ============================================================
+   GIGS PLACEHOLDERS
+   ============================================================ */
+
+
+.gig-list {
+  display: grid;
+
+  gap: 14px;
+}
+
+
+.gig-placeholder {
+  display: grid;
+
+  grid-template-columns:
+    minmax(90px, 140px)
+    1fr;
+
+  gap:
+    clamp(18px, 4vw, 48px);
+
+  align-items: center;
+
+  padding: 24px;
+
+  border:
+    var(--line-width)
+    solid
+    var(--ink);
+
+  background:
+    rgba(255, 255, 255, 0.25);
+}
+
+
+.gig-placeholder p {
+  margin:
+    6px 0 0;
+}
+
+
+.gig-date {
+  display: grid;
+
+  min-height: 70px;
+
+  place-items: center;
+
+  border:
+    var(--line-width)
+    solid
+    var(--ink);
+
+  font-weight: 800;
+}
+
+
+/* ============================================================
+   ABOUT PLACEHOLDERS
+   ============================================================ */
+
+
+.about-layout {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(280px, 0.9fr);
+
+  gap:
+    clamp(36px, 7vw, 90px);
+}
+
+
+.about-copy p:not(.prototype-label) {
+  max-width: 62ch;
+
+  font-size:
+    clamp(1rem, 1.5vw, 1.2rem);
+
+  line-height: 1.65;
+}
+
+
+.member-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 14px;
+}
+
+
+.member-placeholder {
+  display: grid;
+
+  aspect-ratio:
+    4 / 5;
+
+  place-items: center;
+
+  border:
+    var(--line-width)
+    solid
+    var(--ink);
+
+  background:
+    rgba(255, 255, 255, 0.28);
+
+  font-size:
+    0.8rem;
+
+  font-weight: 700;
+}
+
+
+/* ============================================================
+   LISTEN PLACEHOLDERS
+   ============================================================ */
+
+
+.featured-media {
+  display: grid;
+
+  width: 100%;
+
+  aspect-ratio:
+    16 / 9;
+
+  place-items: center;
+
+  border:
+    var(--line-width)
+    solid
+    var(--ink);
+
+  background:
+    rgba(255, 255, 255, 0.3);
+
+  font-size:
+    clamp(1rem, 3vw, 2rem);
+
+  font-weight: 800;
+}
+
+
+.media-tray {
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+
+  gap: 10px;
+
+  margin-top: 18px;
+}
+
+
+.media-tray button {
+  min-height: 90px;
+
+  cursor: pointer;
+
+  border:
+    var(--line-width)
+    solid
+    var(--ink);
+
+  background:
+    rgba(255, 255, 255, 0.25);
+
+  color:
+    var(--ink);
+
+  font-weight: 700;
+}
+
+
+/* ============================================================
+   CONTACT PLACEHOLDER
+   ============================================================ */
+
+
+.contact-placeholder {
+  display: grid;
+
+  min-height: 260px;
+
+  align-content: center;
+
+  text-align: center;
+}
+
+
+/* ============================================================
+   ACCESSIBILITY
+   ============================================================ */
+
+
+.visually-hidden {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+
+  padding: 0;
+  margin: -1px;
+
+  overflow: hidden;
+
+  clip:
+    rect(0 0 0 0);
+
+  white-space: nowrap;
+
+  border: 0;
+}
+
+
+/* ============================================================
+   FIRST RESPONSIVE GUARDRAIL
+
+   This is NOT our final mobile design.
+
+   It merely prevents the prototype from becoming unusable on
+   a narrow browser while preserving the central composition.
+   ============================================================ */
+
+
+@media (max-width: 720px) {
+
+  :root {
+    --outer-border-width: 5px;
+    --ray-gap: 6px;
+    --line-width: 2px;
+  }
+
+
+  .page-shell {
+    padding: 0;
+  }
+
+
+  .site-frame {
+    width: 100%;
+  }
+
+
+  .q-mark {
+    top: 4px;
+
+    width: 68px;
+
+    border-width: 4px;
+  }
+
+
+  .landing {
+    min-height: 560px;
+  }
+
+
+  .landing-nav {
+    gap: 6px;
+
+    padding:
+      86px
+      8px
+      42px;
+  }
+
+
+  .nav-panel {
+    min-height: 280px;
+
+    font-size: 0.78rem;
+  }
+
+
+  .content-section {
+    padding:
+      48px
+      18px;
+
+    scroll-margin-top:
+      160px;
+  }
+
+
+  .about-layout {
+    grid-template-columns: 1fr;
+  }
+
+
+  .member-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+
+  .media-tray {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+
+  .gig-placeholder {
+    grid-template-columns:
+      82px
+      1fr;
+
+    padding: 14px;
+
+    gap: 14px;
+  }
+
+}

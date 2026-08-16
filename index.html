@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+
+    <meta
+      name="description"
+      content="Quaternity — music, performances, media, and booking."
+    />
+
+    <title>Quaternity</title>
+  </head>
+
+  <body>
+    <div class="page-shell">
+
+      <main class="site-frame" id="top">
+
+        <!--
+          Placeholder for the final Quaternity Q / emblem.
+          This intentionally lives OUTSIDE the nested frames so the
+          finished artwork can sit across all of the rays.
+        -->
+        <div class="q-mark" aria-hidden="true">
+          Q
+        </div>
+
+
+        <!--
+          FUTURE STICKY NAVIGATION
+
+          Do not remove this.
+
+          It is hidden for now. Later, when the original Quaternity,
+          Gigs, About, Listen, and Contact labels reach the top of the
+          viewport, JavaScript will progressively reveal their matching
+          items here.
+
+          Keeping this separate prevents the nested framing geometry
+          from fighting CSS sticky positioning.
+        -->
+        <nav
+          class="sticky-stack"
+          aria-label="Persistent section navigation"
+        >
+          <a href="#top" data-sticky-for="brand">Quaternity</a>
+          <a href="#gigs" data-sticky-for="gigs">Gigs</a>
+          <a href="#about" data-sticky-for="about">About</a>
+          <a href="#listen" data-sticky-for="listen">Listen</a>
+          <a href="#contact" data-sticky-for="contact">Contact</a>
+        </nav>
+
+
+        <!-- =======================================================
+             OUTERMOST NESTED RAY: CONTACT
+             This frame surrounds EVERYTHING that appears before
+             the Contact section.
+             ======================================================= -->
+
+        <div class="frame frame-contact">
+
+
+          <!-- =====================================================
+               LISTEN FRAME
+               ===================================================== -->
+
+          <div class="frame frame-listen">
+
+
+            <!-- ===================================================
+                 ABOUT FRAME
+                 =================================================== -->
+
+            <div class="frame frame-about">
+
+
+              <!-- =================================================
+                   GIGS FRAME
+                   This innermost frame surrounds the opening screen.
+                   ================================================= -->
+
+              <div class="frame frame-gigs">
+
+                <header class="landing">
+
+                  <!--
+                    The four vertical navigation panels from your sketch.
+                  -->
+                  <nav
+                    class="landing-nav"
+                    aria-label="Main site navigation"
+                  >
+                    <a
+                      class="nav-panel nav-panel-gigs"
+                      href="#gigs"
+                    >
+                      <span>Gigs</span>
+                    </a>
+
+                    <a
+                      class="nav-panel nav-panel-about"
+                      href="#about"
+                    >
+                      <span>About</span>
+                    </a>
+
+                    <a
+                      class="nav-panel nav-panel-listen"
+                      href="#listen"
+                    >
+                      <span>Listen</span>
+                    </a>
+
+                    <a
+                      class="nav-panel nav-panel-contact"
+                      href="#contact"
+                    >
+                      <span>Contact</span>
+                    </a>
+                  </nav>
+
+
+                  <!--
+                    This is the ORIGINAL Quaternity label.
+
+                    Later it will visually become part of the sticky
+                    navigation as the page scrolls.
+                  -->
+                  <div
+                    class="brand-gate"
+                    data-gate="brand"
+                  >
+                    Quaternity
+                  </div>
+
+                </header>
+
+
+                <!--
+                  The innermost ray turns here and becomes Gigs.
+                -->
+                <a
+                  class="frame-gate"
+                  data-gate="gigs"
+                  href="#gigs"
+                >
+                  Gigs
+                </a>
+
+              </div>
+              <!-- END GIGS FRAME -->
+
+
+              <!-- =================================================
+                   GIGS CONTENT
+
+                   Important:
+                   min-height gives us useful prototype space.
+                   It is NOT a fixed height. Real content can make
+                   this section grow automatically.
+                   ================================================= -->
+
+              <section
+                class="content-section section-gigs"
+                id="gigs"
+              >
+                <h2 class="visually-hidden">Gigs</h2>
+
+                <div class="section-inner">
+
+                  <p class="prototype-label">
+                    GIGS CONTENT
+                  </p>
+
+                  <div class="gig-list">
+
+                    <article class="gig-placeholder">
+                      <div class="gig-date">DATE</div>
+
+                      <div>
+                        <strong>Venue Name</strong>
+                        <p>City · Time · Details</p>
+                      </div>
+                    </article>
+
+                    <article class="gig-placeholder">
+                      <div class="gig-date">DATE</div>
+
+                      <div>
+                        <strong>Venue Name</strong>
+                        <p>City · Time · Details</p>
+                      </div>
+                    </article>
+
+                    <article class="gig-placeholder">
+                      <div class="gig-date">DATE</div>
+
+                      <div>
+                        <strong>Venue Name</strong>
+                        <p>City · Time · Details</p>
+                      </div>
+                    </article>
+
+                    <article class="gig-placeholder">
+                      <div class="gig-date">DATE</div>
+
+                      <div>
+                        <strong>Venue Name</strong>
+                        <p>City · Time · Details</p>
+                      </div>
+                    </article>
+
+                    <article class="gig-placeholder">
+                      <div class="gig-date">DATE</div>
+
+                      <div>
+                        <strong>Venue Name</strong>
+                        <p>City · Time · Details</p>
+                      </div>
+                    </article>
+
+                    <article class="gig-placeholder">
+                      <div class="gig-date">DATE</div>
+
+                      <div>
+                        <strong>Venue Name</strong>
+                        <p>City · Time · Details</p>
+                      </div>
+                    </article>
+                    
+                    <article class="gig-placeholder">
+                      <div class="gig-date">DATE</div>
+
+                      <div>
+                        <strong>Venue Name</strong>
+                        <p>City · Time · Details</p>
+                      </div>
+                    </article>
+
+                    <article class="gig-placeholder">
+                      <div class="gig-date">DATE</div>
+
+                      <div>
+                        <strong>Venue Name</strong>
+                        <p>City · Time · Details</p>
+                      </div>
+                    </article>
+
+                    <article class="gig-placeholder">
+                      <div class="gig-date">DATE</div>
+
+                      <div>
+                        <strong>Venue Name</strong>
+                        <p>City · Time · Details</p>
+                      </div>
+                    </article>                    
+                  </div>
+
+                </div>
+              </section>
+
+
+              <!--
+                The About ray now turns inward.
+              -->
+              <a
+                class="frame-gate"
+                data-gate="about"
+                href="#about"
+              >
+                About
+              </a>
+
+            </div>
+            <!-- END ABOUT FRAME -->
+
+
+            <!-- ===================================================
+                 ABOUT CONTENT
+                 =================================================== -->
+
+            <section
+              class="content-section section-about"
+              id="about"
+            >
+              <h2 class="visually-hidden">About</h2>
+
+              <div class="section-inner about-layout">
+
+                <div class="about-copy">
+                  <p class="prototype-label">
+                    ABOUT CONTENT
+                  </p>
+
+                  <p>
+                    Placeholder band description. This block exists
+                    so we can test how the frame responds to actual
+                    text rather than designing around an empty box.
+                  </p>
+
+                  <p>
+                    Add or remove paragraphs here later. The orange
+                    framing above should simply move as this section
+                    changes size.
+                  </p>
+                </div>
+
+                <div class="member-grid">
+
+                  <div class="member-placeholder">
+                    MEMBER 1
+                  </div>
+
+                  <div class="member-placeholder">
+                    MEMBER 2
+                  </div>
+
+                  <div class="member-placeholder">
+                    MEMBER 3
+                  </div>
+
+                  <div class="member-placeholder">
+                    MEMBER 4
+                  </div>
+
+                </div>
+
+              </div>
+            </section>
+
+
+            <!--
+              The Listen ray turns inward here.
+            -->
+            <a
+              class="frame-gate"
+              data-gate="listen"
+              href="#listen"
+            >
+              Listen
+            </a>
+
+          </div>
+          <!-- END LISTEN FRAME -->
+
+
+          <!-- =====================================================
+               LISTEN CONTENT
+               ===================================================== -->
+
+          <section
+            class="content-section section-listen"
+            id="listen"
+          >
+            <h2 class="visually-hidden">Listen</h2>
+
+            <div class="section-inner">
+
+              <p class="prototype-label">
+                LISTEN CONTENT
+              </p>
+
+              <div class="featured-media">
+                FEATURED VIDEO / AUDIO
+              </div>
+
+              <div class="media-tray">
+
+                <button type="button">
+                  MEDIA 1
+                </button>
+
+                <button type="button">
+                  MEDIA 2
+                </button>
+
+                <button type="button">
+                  MEDIA 3
+                </button>
+
+                <button type="button">
+                  MEDIA 4
+                </button>
+
+                <button type="button">
+                  MEDIA 5
+                </button>
+
+              </div>
+
+            </div>
+          </section>
+
+
+          <!--
+            The final nested ray turns into Contact.
+          -->
+          <a
+            class="frame-gate"
+            data-gate="contact"
+            href="#contact"
+          >
+            Contact
+          </a>
+
+        </div>
+        <!-- END CONTACT FRAME -->
+
+
+        <!-- =======================================================
+             CONTACT CONTENT
+
+             This sits outside the nested ray system but remains
+             inside the site's permanent custom outer border.
+             ======================================================= -->
+
+        <section
+          class="content-section section-contact"
+          id="contact"
+        >
+          <h2 class="visually-hidden">Contact</h2>
+
+          <div class="section-inner contact-placeholder">
+
+            <p class="prototype-label">
+              CONTACT CONTENT
+            </p>
+
+            <p>
+              Booking email · Instagram · YouTube · other links
+            </p>
+
+          </div>
+        </section>
+
+      </main>
+
+    </div>
+
+    <script
+      type="module"
+      src="/src/main.js"
+    ></script>
+  </body>
+</html>
