@@ -28,6 +28,19 @@
   --listen-frame: #c8c8c8;
   --contact-frame: #efe4a4;
 
+  --outer-pattern-image:
+    url("./assets/BG_Flower(1).png");
+
+  --outer-pattern-tile:
+    30px;
+
+  --outer-pattern-size:
+    var(--outer-pattern-tile)
+    var(--outer-pattern-tile);
+
+  --outer-pattern-speed:
+    30s;
+
   --outer-border-width: 8px;
 
   /*
@@ -129,9 +142,44 @@ button {
 
   padding: 0;
 
-  background: var(--ink);
-}
+  background-color:
+    var(--ink);
 
+  background-image:
+    var(--outer-pattern-image);
+
+  background-repeat:
+    repeat;
+
+  background-size:
+    var(--outer-pattern-size);
+
+  background-position:
+    0 0;
+
+  background-attachment:
+    fixed;
+
+  animation:
+    outer-pattern-drift
+    var(--outer-pattern-speed)
+    linear
+    infinite;
+}
+@keyframes outer-pattern-drift {
+
+  from {
+    background-position:
+      0 0;
+  }
+
+  to {
+    background-position:
+      calc(0px - var(--outer-pattern-tile))
+      calc(0px - var(--outer-pattern-tile));
+  }
+
+}
 
 /*
   THIS is the permanent exterior shell.
@@ -263,6 +311,29 @@ button {
   height: 0;
 
   overflow: hidden;
+
+  background:
+    transparent;
+
+  pointer-events: none;
+}
+
+
+.sticky-rays::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 50%;
+
+  width:
+    min(1240px, 100%);
+
+  height: 100%;
+
+  transform:
+    translateX(-50%);
 
   background:
     var(--ink);
