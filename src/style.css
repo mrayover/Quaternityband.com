@@ -946,21 +946,33 @@ button {
 
 .section-gigs {
   min-height: 620px;
+
+  background:
+    var(--gigs-frame);
 }
 
 
 .section-about {
   min-height: 560px;
+
+  background:
+    var(--about-frame);
 }
 
 
 .section-listen {
   min-height: 720px;
+
+  background:
+    var(--listen-frame);
 }
 
 
 .section-contact {
   min-height: 460px;
+
+  background:
+    var(--contact-frame);
 }
 
 
