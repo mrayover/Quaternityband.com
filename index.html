@@ -104,58 +104,70 @@
 
 
         <!--
-          PERSISTENT STACKING NAVIGATION
+          PERSISTENT PRIMARY NAVIGATION
 
-          These elements are fixed-position copies of the original
-          Quaternity and section gates.
+          The four opening navigation labels become one fixed row
+          beneath the Q.
 
-          JavaScript reveals them progressively as their original
-          counterparts reach the top navigation area.
+          Quaternity / YouTube / Instagram then sit directly beneath
+          that row.
 
-          Their horizontal position and width are measured from the
-          original gates, so the nested frame geometry remains the
-          source of truth.
+          The later frame gates remain ordinary section markers and
+          never accumulate into this navigation.
         -->
         <nav
           class="sticky-stack"
           aria-label="Persistent section navigation"
         >
+
+          <div
+            class="sticky-primary-nav"
+            data-sticky-nav
+          >
+
+            <a
+              class="sticky-nav-link sticky-nav-link-gigs"
+              href="#gigs"
+              data-sticky-nav-for="gigs"
+              aria-label="Gigs"
+            >
+              <span class="sticky-nav-word"></span>
+            </a>
+
+            <a
+              class="sticky-nav-link sticky-nav-link-about"
+              href="#about"
+              data-sticky-nav-for="about"
+              aria-label="About"
+            >
+              <span class="sticky-nav-word"></span>
+            </a>
+
+            <a
+              class="sticky-nav-link sticky-nav-link-listen"
+              href="#listen"
+              data-sticky-nav-for="listen"
+              aria-label="Listen"
+            >
+              <span class="sticky-nav-word"></span>
+            </a>
+
+            <a
+              class="sticky-nav-link sticky-nav-link-contact"
+              href="#contact"
+              data-sticky-nav-for="contact"
+              aria-label="Contact"
+            >
+              <span class="sticky-nav-word"></span>
+            </a>
+
+          </div>
+
           <div
             class="sticky-item sticky-item-brand"
             data-sticky-for="brand"
           ></div>
 
-          <a
-            class="sticky-item sticky-item-gigs"
-            href="#gigs"
-            data-sticky-for="gigs"
-          >
-            Gigs
-          </a>
-
-          <a
-            class="sticky-item sticky-item-about"
-            href="#about"
-            data-sticky-for="about"
-          >
-            About
-          </a>
-
-          <a
-            class="sticky-item sticky-item-listen"
-            href="#listen"
-            data-sticky-for="listen"
-          >
-            Listen
-          </a>
-
-          <a
-            class="sticky-item sticky-item-contact"
-            href="#contact"
-            data-sticky-for="contact"
-          >
-            Contact
-          </a>
         </nav>
 
 
@@ -192,60 +204,146 @@
                 <header class="landing">
 
                   <!--
-                    The four vertical navigation panels from your sketch.
+                    LANDING RAY FIELD
+
+                    Four decorative rays descend from beneath the Q
+                    and fan outward into the four navigation headings.
+
+                    The rays are drawn entirely in CSS. They are not
+                    interactive and remain behind the landing content.
+                  -->
+                  <div
+                    class="landing-rays"
+                    aria-hidden="true"
+                  >
+                    <span
+                      class="landing-ray landing-ray-gigs"
+                    ></span>
+
+                    <span
+                      class="landing-ray landing-ray-about"
+                    ></span>
+
+                    <span
+                      class="landing-ray landing-ray-listen"
+                    ></span>
+
+                    <span
+                      class="landing-ray landing-ray-contact"
+                    ></span>
+                  </div>
+
+
+                  <!--
+                    LANDING HERO
+
+                    The video block sits above the ray layer, so the
+                    four rays disappear behind it rather than crossing
+                    visibly over the video.
+
+                    The next-gig slot is structurally ready for real
+                    event data later.
+                  -->
+                  <div class="landing-hero">
+
+                    <div
+                      class="landing-video-block"
+                      data-landing-video
+                    >
+                      <iframe
+                        src="https://www.youtube.com/embed/_SNho13pPxc?autoplay=1&mute=1&controls=0&playsinline=1&loop=1&playlist=_SNho13pPxc&rel=0&disablekb=1&fs=0"
+                        title="Quaternity featured video"
+                        allow="autoplay; encrypted-media"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                      ></iframe>
+                    </div>
+
+                    <div
+                      class="landing-next-gig"
+                      data-next-gig
+                    >
+                      <span>
+                        Next Gig
+                      </span>
+                    </div>
+
+                  </div>
+
+
+                  <!--
+                    The four rays terminate directly in these four
+                    joined navigation headings.
                   -->
                   <nav
                     class="landing-nav"
                     aria-label="Main site navigation"
                   >
+
                     <a
                       class="nav-panel nav-panel-gigs"
                       href="#gigs"
+                      data-nav-for="gigs"
                     >
-                      <span>Gigs</span>
+                      <span class="nav-word">
+                        <img
+                          src="/assets/words/Gigs_Word.svg"
+                          alt="Gigs"
+                        />
+                      </span>
                     </a>
 
                     <a
                       class="nav-panel nav-panel-about"
                       href="#about"
+                      data-nav-for="about"
                     >
-                      <span>About</span>
+                      <span class="nav-word">
+                        <img
+                          src="/assets/words/About_Word.svg"
+                          alt="About"
+                        />
+                      </span>
                     </a>
 
                     <a
                       class="nav-panel nav-panel-listen"
                       href="#listen"
+                      data-nav-for="listen"
                     >
-                      <span>Listen</span>
+                      <span class="nav-word">
+                        <img
+                          src="/assets/words/Listen_Word.svg"
+                          alt="Listen"
+                        />
+                      </span>
                     </a>
 
                     <a
                       class="nav-panel nav-panel-contact"
                       href="#contact"
+                      data-nav-for="contact"
                     >
-                      <span>Contact</span>
+                      <span class="nav-word">
+                        <img
+                          src="/assets/words/Contact_Word.svg"
+                          alt="Contact"
+                        />
+                      </span>
                     </a>
+
                   </nav>
 
 
                   <!--
-                    This is the ORIGINAL Quaternity label.
-
-                    Later it will visually become part of the sticky
-                    navigation as the page scrolls.
+                    Quaternity / socials remain the final row of the
+                    landing and become the second persistent row after
+                    the navigation catches beneath the Q.
                   -->
                   <div
                     class="brand-gate"
                     data-gate="brand"
                   >
 
-                    <!--
-                      Temporary text treatments.
-                      These can later become icons without changing this layout.
-
-                      Replace href="#" with the real channel/profile URLs once
-                      we're ready to wire the final social links.
-                    -->
                     <a
                       class="brand-social brand-social-youtube"
                       href="#"
@@ -274,18 +372,6 @@
                   </div>
 
                 </header>
-
-
-                <!--
-                  The innermost ray turns here and becomes Gigs.
-                -->
-                <a
-                  class="frame-gate"
-                  data-gate="gigs"
-                  href="#gigs"
-                >
-                  Gigs
-                </a>
 
               </div>
               <!-- END GIGS FRAME -->
@@ -399,18 +485,6 @@
                 </div>
               </section>
 
-
-              <!--
-                The About ray now turns inward.
-              -->
-              <a
-                class="frame-gate"
-                data-gate="about"
-                href="#about"
-              >
-                About
-              </a>
-
             </div>
             <!-- END ABOUT FRAME -->
 
@@ -468,18 +542,6 @@
               </div>
             </section>
 
-
-            <!--
-              The Listen ray turns inward here.
-            -->
-            <a
-              class="frame-gate"
-              data-gate="listen"
-              href="#listen"
-            >
-              Listen
-            </a>
-
           </div>
           <!-- END LISTEN FRAME -->
 
@@ -530,18 +592,6 @@
 
             </div>
           </section>
-
-
-          <!--
-            The final nested ray turns into Contact.
-          -->
-          <a
-            class="frame-gate"
-            data-gate="contact"
-            href="#contact"
-          >
-            Contact
-          </a>
 
         </div>
         <!-- END CONTACT FRAME -->

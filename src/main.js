@@ -1,20 +1,18 @@
 /* ============================================================
-   QUATERNITY — PROGRESSIVE STACKING NAVIGATION
+   QUATERNITY — PERSISTENT PRIMARY NAVIGATION
    ============================================================ */
 
 
 /*
-  The original gates remain part of normal document flow.
+  The landing contains the full decorative ray construction.
 
-  This script does NOT move them.
+  Once the joined four-heading navigation reaches the Q, fixed
+  copies of the navigation and Quaternity bar take over.
 
-  Instead, it progressively reveals fixed-position copies as
-  each original gate reaches its assigned resting position
-  beneath the Q.
+  The decorative landing rays remain ordinary page content and
+  naturally scroll away.
 
-  Because each fixed copy measures its source gate directly,
-  changes to frame widths, ray spacing, or responsive layout
-  automatically carry through to the sticky navigation.
+  Nothing accumulates beneath the persistent navigation.
 */
 
 
@@ -47,39 +45,69 @@ if (
 ) {
 
   /*
-    Collect the fixed navigation items in their intended
-    stacking order:
-    Quaternity → Gigs → About → Listen → Contact
+    The persistent four-heading navigation.
   */
-  const stickyItems =
-    Array.from(
-      stickyStack.querySelectorAll('[data-sticky-for]')
+  const stickyPrimaryNav =
+    stickyStack.querySelector('[data-sticky-nav]')
+
+
+  /*
+    Persistent Quaternity / social row.
+  */
+  const brandSticky =
+    stickyStack.querySelector(
+      '[data-sticky-for="brand"]'
     )
 
 
   /*
-    Collect the four fixed ray bands.
+    Original landing navigation.
+
+    Its four real heading cells remain the horizontal source of
+    truth for the persistent copy.
   */
-  const stickyRayItems =
-    Array.from(
-      stickyRays.querySelectorAll('[data-sticky-ray-for]')
-    )
+  const landingNavSource =
+    document.querySelector('.landing-nav')
+
+
+  const landingNavPanels =
+    landingNavSource
+      ? Array.from(
+          landingNavSource.querySelectorAll(
+            '[data-nav-for]'
+          )
+        )
+      : []
 
 
   /*
-    The original landing element defines the exact dimensions
-    of the fixed yellow center inside the persistent crown.
+    Original yellow landing field used to reconstruct the
+    persistent crown behind the fixed navigation.
   */
   const landingSource =
     document.querySelector('.landing')
 
 
   /*
-    Map each fixed ray to the original frame whose top edge it
-    visually duplicates.
-
-    The original nested frame remains the source of truth.
+    The original Quaternity row.
   */
+  const brandSource =
+    document.querySelector(
+      '[data-gate="brand"]'
+    )
+
+
+  /*
+    Collect the four fixed outer ray fields.
+  */
+  const stickyRayItems =
+    Array.from(
+      stickyRays.querySelectorAll(
+        '[data-sticky-ray-for]'
+      )
+    )
+
+
   const rayNames = [
     'contact',
     'listen',
@@ -100,42 +128,9 @@ if (
 
 
   /*
-    Build a map between each name and its ORIGINAL gate in
-    normal document flow.
-
-    Example:
-    "gigs" → the original blue Gigs banner.
+    Copy the real Quaternity/social contents into its persistent
+    version so there remains one visual source of truth.
   */
-  const sourceGates =
-    new Map(
-      Array.from(
-        document.querySelectorAll('[data-gate]')
-      ).map(
-        (gate) => [
-          gate.dataset.gate,
-          gate,
-        ]
-      )
-    )
-
-
-  /*
-    Quaternity contains more than a single word now.
-
-    Copy the actual contents of the original brand bar into the
-    fixed version so YouTube / Quaternity / Instagram remain one
-    object and there is only one visual source of truth.
-  */
-  const brandSource =
-    sourceGates.get('brand')
-
-
-  const brandSticky =
-    stickyStack.querySelector(
-      '[data-sticky-for="brand"]'
-    )
-
-
   if (brandSource && brandSticky) {
     brandSticky.innerHTML =
       brandSource.innerHTML
@@ -143,18 +138,162 @@ if (
 
 
   /*
-    Prevent scroll events from performing repeated layout work
-    faster than the browser can draw it.
+    Copy each original SVG wordmark into the matching persistent
+    navigation cell.
   */
+  const stickyNavLinks =
+    stickyPrimaryNav
+      ? Array.from(
+          stickyPrimaryNav.querySelectorAll(
+            '[data-sticky-nav-for]'
+          )
+        )
+      : []
+
+
+  if (landingNavSource) {
+
+    stickyNavLinks.forEach(
+      (stickyLink) => {
+
+        const navName =
+          stickyLink.dataset.stickyNavFor
+
+
+        const sourceWord =
+          landingNavSource.querySelector(
+            `[data-nav-for="${navName}"] .nav-word`
+          )
+
+
+        const stickyWord =
+          stickyLink.querySelector(
+            '.sticky-nav-word'
+          )
+
+
+        if (sourceWord && stickyWord) {
+          stickyWord.innerHTML =
+            sourceWord.innerHTML
+        }
+
+      }
+    )
+
+  }
+
+
+  /*
+    Actual content sections determine which navigation heading
+    receives the current-section outline.
+  */
+  const sectionOrder = [
+    'gigs',
+    'about',
+    'listen',
+    'contact',
+  ]
+
+
+  const contentSections =
+    sectionOrder
+      .map(
+        (name) => ({
+          name,
+          section:
+            document.getElementById(name),
+        })
+      )
+      .filter(
+        ({ section }) =>
+          section
+      )
+
+
+  const contentSectionByName =
+    new Map(
+      contentSections.map(
+        ({ name, section }) => [
+          name,
+          section,
+        ]
+      )
+    )
+
+
   let updateQueued =
     false
 
 
-  const updateStickyStack = () => {
+  const updateCurrentSection = (
+    stackBottom,
+    navigationIsActive
+  ) => {
+
+    let currentSection =
+      null
+
+
+    if (navigationIsActive) {
+
+      const probeY =
+        stackBottom + 1
+
+
+      contentSections.forEach(
+        ({ name, section }) => {
+
+          const sectionRect =
+            section.getBoundingClientRect()
+
+
+          if (sectionRect.top <= probeY) {
+            currentSection =
+              name
+          }
+
+        }
+      )
+
+    }
+
+
+    stickyNavLinks.forEach(
+      (stickyLink) => {
+
+        const isCurrent =
+          stickyLink.dataset.stickyNavFor
+          === currentSection
+
+
+        stickyLink.classList.toggle(
+          'is-current',
+          isCurrent
+        )
+
+
+        if (isCurrent) {
+          stickyLink.setAttribute(
+            'aria-current',
+            'location'
+          )
+        } else {
+          stickyLink.removeAttribute(
+            'aria-current'
+          )
+        }
+
+      }
+    )
+
+  }
+
+
+  const updateStickyNavigation = () => {
 
     /*
-      The fixed Q determines the permanent bottom edge of the
-      entire header crown.
+      The fixed Q establishes the top of the persistent
+      navigation system.
     */
     const qRect =
       qMark.getBoundingClientRect()
@@ -165,18 +304,51 @@ if (
 
 
     /*
-      Keep the Q shelf permanently aligned with the Q.
+      Read the same overlap value used by the landing rays.
+
+      This makes the original ray geometry and the persistent
+      navigation share one exact relationship to the Q.
     */
+    const rootStyles =
+      getComputedStyle(
+        document.documentElement
+      )
+
+
+    const qOverlapDepth =
+      Number.parseFloat(
+        rootStyles.getPropertyValue(
+          '--q-overlap-depth'
+        )
+      ) || 0
+
+
+    /*
+      The ghost is exactly one frame thickness.
+
+      This is 12px in the desktop system and follows the current
+      responsive frame thickness automatically on smaller screens.
+    */
+    const ghostHeight =
+      Number.parseFloat(
+        rootStyles.getPropertyValue(
+          '--ray-gap'
+        )
+      ) || 12
+
+
+    const navTop =
+      shelfTop
+      - qOverlapDepth
+
+
     qShelf.style.top =
       `${shelfTop}px`
 
 
     /*
-      Measure the fixed nested rays now, but do not decide their
-      bottom edge yet.
-
-      Their final height depends on how many navigation bands
-      have accumulated beneath the Q.
+      Rebuild the original nested outer rays above the persistent
+      navigation exactly as before.
     */
     const rayGeometry = []
 
@@ -220,6 +392,7 @@ if (
         rayGeometry.push({
           stickyRay,
           stableTop,
+          rayName,
         })
 
       }
@@ -227,16 +400,20 @@ if (
 
 
     /*
-      Fill the innermost portion of the permanent crown with the
-      same yellow field used by the landing page.
+      Reconstruct the yellow landing center behind the persistent
+      navigation.
     */
+    let stableLandingTop =
+      null
+
+
     if (landingSource) {
 
       const landingRect =
         landingSource.getBoundingClientRect()
 
 
-      const stableLandingTop =
+      stableLandingTop =
         landingRect.top + window.scrollY
 
 
@@ -251,150 +428,302 @@ if (
       stickyCrownCore.style.width =
         `${landingRect.width}px`
 
+    }
 
-      stickyCrownCore.style.height =
-        `${Math.max(
-          0,
-          shelfTop - stableLandingTop
-        )}px`
+
+    /*
+      Before the navigation engages, the fixed crown ends at the
+      same vertical position where the persistent navigation will
+      eventually rest.
+
+      This leaves the Q overlap zone available to the scrolling
+      landing rays instead of masking them down to the physical
+      bottom of the emblem.
+    */
+    let stackBottom =
+      navTop
+
+
+    let navigationIsActive =
+      false
+
+
+    if (
+      stickyPrimaryNav
+      && brandSticky
+      && landingNavPanels.length >= 2
+      && brandSource
+    ) {
+
+      const firstPanelRect =
+        landingNavPanels[0]
+          .getBoundingClientRect()
+
+
+      const lastPanelRect =
+        landingNavPanels[
+          landingNavPanels.length - 1
+        ].getBoundingClientRect()
+
+
+      const brandRect =
+        brandSource.getBoundingClientRect()
+
+
+      /*
+        Preserve the exact left and right edges of the original
+        joined heading bar when it becomes persistent.
+
+        The row rests slightly behind the lower edge of the Q.
+        This is now its REAL position rather than a later CSS
+        transform.
+      */
+      stickyPrimaryNav.style.top =
+        `${navTop}px`
+
+
+      stickyPrimaryNav.style.left =
+        `${firstPanelRect.left}px`
+
+
+      stickyPrimaryNav.style.width =
+        `${
+          lastPanelRect.right
+          - firstPanelRect.left
+        }px`
+
+
+      const primaryNavHeight =
+        stickyPrimaryNav.offsetHeight
+
+
+      const brandTop =
+        navTop
+        + primaryNavHeight
+
+
+      /*
+        Quaternity remains directly beneath the heading bar and
+        retains the original landing bar's exact horizontal size.
+      */
+      brandSticky.style.top =
+        `${brandTop}px`
+
+
+      brandSticky.style.left =
+        `${brandRect.left}px`
+
+
+      brandSticky.style.width =
+        `${brandRect.width}px`
+
+
+      /*
+        Switch to the fixed navigation at the exact instant that
+        the original button row reaches its permanent resting
+        position beneath the Q.
+
+        Comparing top edge to top edge avoids any discrepancy
+        caused by the brand row or navigation overlap.
+      */
+      navigationIsActive =
+        firstPanelRect.top <= navTop
+
+
+      stickyPrimaryNav.classList.toggle(
+        'is-active',
+        navigationIsActive
+      )
+
+
+      brandSticky.classList.toggle(
+        'is-active',
+        navigationIsActive
+      )
+
+
+      if (navigationIsActive) {
+        stackBottom =
+          brandTop
+          + brandSticky.offsetHeight
+      }
+
+    } else {
+
+      if (stickyPrimaryNav) {
+        stickyPrimaryNav.classList.remove(
+          'is-active'
+        )
+      }
+
+
+      if (brandSticky) {
+        brandSticky.classList.remove(
+          'is-active'
+        )
+      }
 
     }
 
 
-    let nextTop =
-      shelfTop
+    /*
+      The permanent navigation itself ends here.
+
+      Ghost strips are added beneath this point, but the yellow
+      crown and the original nested ray fields must continue to
+      end here so they cannot paint over those strips.
+    */
+    const crownBottom =
+      stackBottom
+
 
     /*
-      Later items may only join after every item before them has
-      already joined.
+      Count how many section frames have reached the persistent
+      crown.
 
-      This guarantees the order can never become:
-      Quaternity → About
-      while Gigs is somehow missing.
+      Each caught section adds one complete frame thickness to
+      the nested closure beneath the navigation.
+
+      The catch line moves downward as those frame closures
+      accumulate.
     */
-    let previousItemIsActive =
-      true
+    let ghostCount =
+      0
 
 
-    stickyItems.forEach(
-      (stickyItem) => {
+    if (navigationIsActive) {
 
-        const gateName =
-          stickyItem.dataset.stickyFor
+      sectionOrder.forEach(
+        (sectionName) => {
 
-
-        const sourceGate =
-          sourceGates.get(gateName)
-
-
-        if (!sourceGate) {
-          stickyItem.classList.remove(
-            'is-active'
-          )
-
-          previousItemIsActive =
-            false
-
-          return
-        }
+          const section =
+            contentSectionByName.get(
+              sectionName
+            )
 
 
-        /*
-          Measure the REAL original gate.
-
-          This gives the fixed copy the exact same horizontal
-          placement and width as the geometry currently rendered
-          by the browser.
-        */
-        const sourceRect =
-          sourceGate.getBoundingClientRect()
+          if (!section) {
+            return
+          }
 
 
-        /*
-          Every accumulated item keeps the exact width and
-          horizontal position of its original gate.
-
-          This preserves the nested color structure naturally:
-          the yellow Quaternity band remains inside the blue
-          Gigs frame, leaving the blue ray visible on both sides.
-        */
-        stickyItem.style.left =
-          `${sourceRect.left}px`
+          const sectionRect =
+            section.getBoundingClientRect()
 
 
-        stickyItem.style.width =
-          `${sourceRect.width}px`
+          const catchLine =
+            crownBottom
+            + (
+              ghostCount
+              * ghostHeight
+            )
 
 
-        stickyItem.style.top =
-          `${nextTop}px`
-
-
-        /*
-          A gate becomes persistent once its original top edge
-          reaches the next available stacking position.
-        */
-        const shouldStick =
-          previousItemIsActive
-          && sourceRect.top <= nextTop
-
-
-        stickyItem.classList.toggle(
-          'is-active',
-          shouldStick
-        )
-
-
-        /*
-          Once an item joins the stack, the next gate receives
-          the position directly beneath it.
-        */
-        if (shouldStick) {
-
-          const itemBottom =
-            nextTop
-            + stickyItem.offsetHeight
-
-          nextTop =
-            itemBottom
-
-        } else {
-
-          previousItemIsActive =
-            false
+          if (sectionRect.top <= catchLine) {
+            ghostCount += 1
+          }
 
         }
+      )
 
-      }
+    }
+
+
+    /*
+      The complete visible persistent stack includes all retained
+      frame closures.
+    */
+    stackBottom =
+      crownBottom
+      + (
+        ghostCount
+        * ghostHeight
+      )
+
+
+    /*
+      Current-section indication lives entirely in the four-word
+      navigation.
+    */
+    updateCurrentSection(
+      stackBottom,
+      navigationIsActive
     )
 
 
     /*
-      Extend the complete nested color structure to the bottom
-      of the currently accumulated navigation stack.
+      The yellow crown ends with the permanent navigation.
 
-      Because the sticky headings sit above this layer, each
-      heading replaces only the center of its corresponding ray
-      while the outer colors continue naturally down its sides.
+      Ghost strips exist beneath it and must remain visible rather
+      than being covered by an extended yellow center.
     */
-    const stackBottom =
-      nextTop
+    if (stableLandingTop !== null) {
+      stickyCrownCore.style.height =
+        `${Math.max(
+          0,
+          crownBottom - stableLandingTop
+        )}px`
+    }
 
 
+    /*
+      The overall fixed crown includes the accumulated ghost area
+      so the black exterior remains intact around each closing
+      frame strip.
+    */
     stickyRays.style.height =
       `${stackBottom}px`
 
 
+    /*
+      Extend the real nested frame fields through the accumulated
+      closure area.
+
+      Inner frames stop first while outer frames continue farther
+      down. This preserves the color that was already surrounding
+      each frame instead of exposing the black backing.
+
+      With four accumulated frames:
+
+      Gigs    extends 1 frame thickness
+      About   extends 2 frame thicknesses
+      Listen  extends 3 frame thicknesses
+      Contact extends 4 frame thicknesses
+    */
     rayGeometry.forEach(
       ({
         stickyRay,
         stableTop,
+        rayName,
       }) => {
+
+        const rayIndex =
+          sectionOrder.indexOf(
+            rayName
+          )
+
+
+        const retainedRows =
+          rayIndex >= 0
+            ? Math.min(
+                ghostCount,
+                rayIndex + 1
+              )
+            : 0
+
+
+        const rayBottom =
+          crownBottom
+          + (
+            retainedRows
+            * ghostHeight
+          )
+
 
         stickyRay.style.height =
           `${Math.max(
             0,
-            stackBottom - stableTop
+            rayBottom - stableTop
           )}px`
 
       }
@@ -403,13 +732,10 @@ if (
 
     updateQueued =
       false
+
   }
 
 
-  /*
-    Schedule one update for the next browser paint rather than
-    doing layout calculations directly inside every scroll event.
-  */
   const queueStickyUpdate = () => {
 
     if (updateQueued) {
@@ -422,21 +748,11 @@ if (
 
 
     window.requestAnimationFrame(
-      updateStickyStack
+      updateStickyNavigation
     )
   }
 
 
-  /*
-    Scroll:
-    determine which gates have reached the stack.
-
-    Resize:
-    re-measure widths and horizontal positions.
-
-    Load:
-    catches restored scroll positions and initial layout.
-  */
   window.addEventListener(
     'scroll',
     queueStickyUpdate,
@@ -457,12 +773,8 @@ if (
 
 
   /*
-    If content later changes size because of loaded images,
-    embeds, calendar data, etc., automatically re-check the
-    geometry.
-
-    This prevents us having to revisit the stacking engine when
-    real content replaces the placeholders.
+    Real images, video embeds, gig data, etc. may later change
+    page geometry. Re-measure automatically when that occurs.
   */
   if ('ResizeObserver' in window) {
 
@@ -487,9 +799,6 @@ if (
   }
 
 
-  /*
-    Establish the correct state immediately.
-  */
-  updateStickyStack()
+  updateStickyNavigation()
 
 }

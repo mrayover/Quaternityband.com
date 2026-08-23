@@ -51,6 +51,97 @@
   --ray-gap: 12px;
 
   /*
+    The four headings form one continuous navigation object both
+    on the landing and after becoming persistent.
+  */
+  --landing-nav-gap: 0px;
+
+  /*
+    Height of the joined four-heading navigation row.
+  */
+  --landing-nav-height:
+    clamp(54px, 5vw, 66px);
+
+  /*
+    Height of the Quaternity / social row directly beneath it.
+  */
+  --landing-brand-height: 42px;
+
+  /*
+    Horizontal inset shared by the ray field and heading bar.
+
+    Because both use this exact value, every ray terminates
+    mathematically at its corresponding navigation cell.
+  */
+  --landing-nav-inline:
+    clamp(22px, 6vw, 90px);
+
+  /*
+    The fixed Q position and size are also used to determine where
+    the decorative landing stems should begin.
+  */
+  --q-mark-top: 10px;
+
+  --q-mark-size:
+    clamp(70px, 8vw, 100px);
+
+  /*
+    Amount that the ray/nav geometry rises behind the lower
+    edge of the Q.
+
+    Using one ray thickness keeps the relationship proportional
+    on desktop and mobile.
+  */
+  --q-overlap-depth:
+    var(--ray-gap);
+
+  /*
+    Width of each of the four vertical rays emerging beneath Q.
+
+    This matches the outer ray thickness so the inner stems read
+    as continuations of the same structural system.
+  */
+  --landing-ray-width:
+    var(--ray-gap);
+
+  /*
+    Begin the decorative stems slightly behind the Q rather than
+    exactly at its visible bottom edge.
+
+    The Q itself masks this overlap, so the rays appear to issue
+    cleanly from beneath the circular emblem.
+  */
+  --landing-ray-start:
+    calc(
+      var(--q-mark-top)
+      + var(--q-mark-size)
+      - var(--landing-top-offset)
+      - var(--q-overlap-depth)
+    );
+
+  /*
+    Small overlap between the fanned ray geometry and the
+    horizontal navigation row. This hides anti-aliased seams.
+  */
+  --landing-ray-nav-overlap: 2px;
+
+  /*
+    Vertical distance over which each narrow ray fans outward
+    into its navigation quarter.
+  */
+  --landing-ray-turn-height:
+    clamp(76px, 9vw, 118px);
+
+  /*
+    Landing content dimensions.
+  */
+  --landing-video-width:
+    clamp(260px, 58vw, 620px);
+
+  --landing-next-gig-width:
+    clamp(240px, 44vw, 500px);
+
+  /*
     Consistent line weight for the internal geometry.
   */
   --line-width: 0px;
@@ -226,7 +317,9 @@ button {
 
   z-index: 40;
 
-  top: 10px;
+  top:
+    var(--q-mark-top);
+
   left: 50%;
 
   transform:
@@ -235,7 +328,7 @@ button {
   display: grid;
 
   width:
-    clamp(70px, 8vw, 100px);
+    var(--q-mark-size);
 
   aspect-ratio: 1;
 
@@ -257,7 +350,6 @@ button {
 
   line-height: 1;
 }
-
 
 /*
   Persistent horizontal shelf directly beneath the Q.
@@ -281,7 +373,20 @@ button {
   width: 100vw;
   height: 0;
 
+  overflow: visible;
+
   pointer-events: none;
+}
+
+
+/*
+  The shelf remains only as a JavaScript positioning anchor.
+
+  It no longer draws any visible geometry. The landing rays
+  themselves now overlap behind the lower edge of the Q.
+*/
+.q-shelf::after {
+  content: none;
 }
 
 
@@ -371,27 +476,15 @@ button {
 }
 
 
+/*
+  The accumulated frame closures are now created by extending
+  the actual nested sticky-ray fields.
+
+  No separate pseudo-element is required. This prevents the
+  black crown backing from appearing between nested colors.
+*/
 .sticky-ray::after {
-  content: "";
-
-  position: absolute;
-
-  top: 100%;
-  left: 0;
-
-  width: 100%;
-  height: 2px;
-
-  background:
-    inherit;
-
-  pointer-events: none;
-}
-
-
-.site-frame:has(.sticky-item-brand.is-active)
-.sticky-ray::after {
-  height: 0;
+  content: none;
 }
 
 
@@ -454,6 +547,17 @@ button {
 }
 
 
+/*
+  The tiny yellow extension is useful while the landing crown is
+  exposed, but once the persistent navigation has engaged the
+  collected section rays become the bottom edge of the header.
+*/
+.site-frame:has(.sticky-item-brand.is-active)
+.sticky-crown-core::after {
+  height: 0;
+}
+
+
 
 
 
@@ -476,44 +580,136 @@ button {
 
 
 /*
-  Each sticky item receives its exact top, left, and width from
-  JavaScript.
+  The four section names now behave as ONE navigation row.
 
-  Its width and horizontal position are measured from the
-  original gate it represents, preserving the nested geometry
-  without hard-coded duplicate dimensions.
+  JavaScript measures the original opening navigation and gives
+  this fixed copy the same horizontal position and width.
+
+  Its vertical overlap with the Q is also calculated directly
+  in JavaScript so there is only one positioning system.
 */
-.sticky-item {
+.sticky-primary-nav {
   position: fixed;
 
-  display: flex;
+  display: grid;
 
-  min-height: 36px;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
 
-  align-items: center;
-  justify-content: center;
+  gap:
+    var(--landing-nav-gap);
 
-  border: 0;
+  height:
+    var(--landing-nav-height);
 
   visibility: hidden;
 
   opacity: 0;
 
   pointer-events: none;
+}
 
-  font-size:
-    clamp(1rem, 1.8vw, 1.25rem);
 
-  font-weight: 700;
+.sticky-primary-nav.is-active {
+  visibility: visible;
 
-  line-height: 1;
+  opacity: 1;
+
+  pointer-events: auto;
+}
+
+
+.sticky-nav-link {
+  display: grid;
+
+  min-width: 0;
+
+  place-items: center;
+
+  padding:
+    6px
+    8px;
+}
+
+
+.sticky-nav-link-gigs {
+  background:
+    var(--gigs-frame);
+}
+
+
+.sticky-nav-link-about {
+  background:
+    var(--about-frame);
+}
+
+
+.sticky-nav-link-listen {
+  background:
+    var(--listen-frame);
+}
+
+
+.sticky-nav-link-contact {
+  background:
+    var(--contact-frame);
 }
 
 
 /*
-  JavaScript adds this class precisely when the corresponding
-  original gate reaches its assigned position in the stack.
+  The section indicator surrounds only the word itself rather
+  than drawing another border around the complete colored cell.
 */
+.sticky-nav-word {
+  display: grid;
+
+  place-items: center;
+
+  padding:
+    3px
+    8px;
+
+  border:
+    2px solid
+    transparent;
+}
+
+
+.sticky-nav-link.is-current
+.sticky-nav-word {
+  border-color:
+    var(--ink);
+}
+
+
+.sticky-nav-word img {
+  display: block;
+
+  width: auto;
+
+  max-width: 100%;
+
+  height:
+    clamp(22px, 2.2vw, 30px);
+}
+
+
+/*
+  Quaternity is the only remaining .sticky-item.
+
+  It appears as the second row beneath the four-button navigation.
+*/
+.sticky-item {
+  position: fixed;
+
+  visibility: hidden;
+
+  opacity: 0;
+
+  pointer-events: none;
+}
+
+
 .sticky-item.is-active {
   visibility: visible;
 
@@ -523,20 +719,14 @@ button {
 }
 
 
-/*
-  Quaternity uses the same three-column structure as the
-  original landing-page brand bar.
-
-  JavaScript copies the original contents into this element,
-  including the social links.
-*/
 .sticky-item-brand {
   display: grid;
 
   grid-template-columns:
     1fr auto 1fr;
 
-  min-height: 42px;
+  height:
+    var(--landing-brand-height);
 
   align-items: center;
 
@@ -554,30 +744,6 @@ button {
     clamp(1rem, 2vw, 1.4rem);
 
   font-weight: 600;
-}
-
-
-.sticky-item-gigs {
-  background:
-    var(--gigs-frame);
-}
-
-
-.sticky-item-about {
-  background:
-    var(--about-frame);
-}
-
-
-.sticky-item-listen {
-  background:
-    var(--listen-frame);
-}
-
-
-.sticky-item-contact {
-  background:
-    var(--contact-frame);
 }
 
 
@@ -662,101 +828,408 @@ button {
 
 
 .landing {
-  display: flex;
+  position: relative;
+
+  display: grid;
 
   /*
-    Fill exactly the portion of the first viewport remaining
-    beneath the nested ray tops.
+    The landing has three permanent vertical regions:
 
-    Result:
-    the Quaternity strip lands at the bottom of the first
-    viewport and the Gigs gate begins below the fold.
+    1. hero / video / next gig
+    2. joined four-heading navigation
+    3. Quaternity / social bar
   */
+  grid-template-rows:
+    minmax(0, 1fr)
+    var(--landing-nav-height)
+    var(--landing-brand-height);
+
   min-height:
     calc(100svh - var(--landing-top-offset));
 
-  flex-direction: column;
+  overflow: hidden;
 
   background:
     var(--content-background);
 }
 
 
+/* ============================================================
+   LANDING RAYS
+   ============================================================ */
+
+
 /*
-  This is deliberately generous.
+  The ray field occupies precisely the space above the navigation
+  row.
 
-  The Q sits above it and the four navigation columns occupy
-  the central visual field.
+  Its left and right edges use the same variable as the landing
+  navigation, so its four 25% destinations align exactly with the
+  four navigation cells beneath it.
 */
-.landing-nav {
-  display: grid;
+.landing-rays {
+  position: absolute;
 
-  flex: 1;
+  z-index: 1;
 
-  grid-template-columns:
-    repeat(4, minmax(0, 1fr));
+  top:
+    var(--landing-ray-start);
 
-  align-items: center;
+  right:
+    var(--landing-nav-inline);
 
-  gap:
-    clamp(8px, 2vw, 22px);
+  bottom:
+    calc(
+      var(--landing-nav-height)
+      + var(--landing-brand-height)
+    );
 
-  padding:
-    clamp(60px, 8vw, 100px)
-    clamp(14px, 5vw, 80px)
-    clamp(24px, 4vw, 48px);
+  left:
+    var(--landing-nav-inline);
 
-  /*
-    Slight optical lift without changing the actual document
-    geometry or the position of the Quaternity anchor below.
-  */
-  transform:
-    translateY(-18px);
+  pointer-events: none;
+}
+
+.site-frame:has(.sticky-primary-nav.is-active)
+.landing-rays {
+  opacity: 0;
 }
 
 
 /*
-  Placeholder versions of your four vertical slabs.
+  Every ray occupies the complete ray field.
+
+  The clip path leaves only:
+
+  - one narrow vertical stem at the center
+  - one widening diagonal transition
+  - one complete quarter-width destination at the bottom
+
+  The navigation cell itself begins immediately beneath that
+  destination and uses the same color.
 */
-.nav-panel {
+.landing-ray {
+  position: absolute;
+
+  inset: 0;
+
+  clip-path:
+    polygon(
+      var(--stem-left) 0,
+      var(--stem-right) 0,
+      var(--stem-right)
+        calc(
+          100%
+          - var(--landing-ray-turn-height)
+        ),
+      var(--cell-right) 100%,
+      var(--cell-left) 100%,
+      var(--stem-left)
+        calc(
+          100%
+          - var(--landing-ray-turn-height)
+        )
+    );
+}
+
+
+/*
+  The four stems are contiguous beneath the Q.
+
+  Their bottom destinations divide the navigation width into
+  four exact quarters.
+*/
+.landing-ray-gigs {
+  --stem-left:
+    calc(
+      50%
+      - var(--landing-ray-width)
+      - var(--landing-ray-width)
+    );
+
+  --stem-right:
+    calc(
+      50%
+      - var(--landing-ray-width)
+    );
+
+  --cell-left: 0%;
+  --cell-right: 25%;
+
+  background:
+    var(--gigs-frame);
+}
+
+
+.landing-ray-about {
+  --stem-left:
+    calc(
+      50%
+      - var(--landing-ray-width)
+    );
+
+  --stem-right: 50%;
+
+  --cell-left: 25%;
+  --cell-right: 50%;
+
+  background:
+    var(--about-frame);
+}
+
+
+.landing-ray-listen {
+  --stem-left: 50%;
+
+  --stem-right:
+    calc(
+      50%
+      + var(--landing-ray-width)
+    );
+
+  --cell-left: 50%;
+  --cell-right: 75%;
+
+  background:
+    var(--listen-frame);
+}
+
+
+.landing-ray-contact {
+  --stem-left:
+    calc(
+      50%
+      + var(--landing-ray-width)
+    );
+
+  --stem-right:
+    calc(
+      50%
+      + var(--landing-ray-width)
+      + var(--landing-ray-width)
+    );
+
+  --cell-left: 75%;
+  --cell-right: 100%;
+
+  background:
+    var(--contact-frame);
+}
+
+
+/* ============================================================
+   LANDING HERO
+   ============================================================ */
+
+
+/*
+  Hero content sits ABOVE the ray field.
+
+  The opaque yellow video and next-gig surfaces therefore mask
+  the rays where they overlap, making the rays appear to pass
+  naturally behind the content.
+*/
+.landing-hero {
+  position: relative;
+
+  z-index: 2;
+
+  grid-row: 1;
+
   display: grid;
 
-  min-height:
-    clamp(260px, 34vw, 410px);
+  align-content: center;
+  justify-items: center;
+
+  gap:
+    clamp(12px, 2vw, 20px);
+
+  padding:
+    clamp(72px, 8vw, 110px)
+    18px
+    calc(
+      var(--landing-ray-turn-height)
+      + clamp(18px, 3vw, 36px)
+    );
+}
+
+
+/*
+  Ready for an iframe, video element, image/link thumbnail, etc.
+
+  The container itself remains transparent so the decorative
+  rays stay visible while this is only a placeholder.
+
+  Once real image, video, or iframe content is inserted, that
+  media will naturally cover the rays only within its own
+  visible rectangle.
+*/
+.landing-video-block {
+  position: relative;
+
+  z-index: 2;
+
+  display: grid;
+
+  width:
+    var(--landing-video-width);
+
+  aspect-ratio:
+    16 / 9;
 
   place-items: center;
 
-  border:
-    var(--line-width)
-    solid
-    var(--ink);
+  overflow: hidden;
 
+  background:
+    transparent;
+}
+
+
+.landing-video-block iframe,
+.landing-video-block video,
+.landing-video-block img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  border: 0;
+
+  object-fit: cover;
+}
+
+
+.landing-placeholder-label {
   font-size:
-    clamp(0.9rem, 1.8vw, 1.25rem);
+    clamp(1rem, 2vw, 1.35rem);
 
   font-weight: 700;
 
   letter-spacing:
-    0.12em;
+    0.04em;
 
-  transition:
-    transform 150ms ease;
+  text-transform: uppercase;
 }
 
 
-.nav-panel:hover,
-.nav-panel:focus-visible {
-  transform:
-    translateY(-5px);
+/*
+  Slim second content zone ready for the next performance.
+
+  It remains deliberately restrained so the video continues to
+  dominate the opening composition.
+*/
+.landing-next-gig {
+  position: relative;
+
+  z-index: 2;
+
+  display: grid;
+
+  width:
+    var(--landing-next-gig-width);
+
+  min-height:
+    clamp(34px, 4vw, 46px);
+
+  place-items: center;
+
+  padding:
+    6px
+    12px;
+
+  border:
+    2px solid
+    var(--ink);
+
+  background:
+    var(--content-background);
+
+  font-size:
+    clamp(0.8rem, 1.4vw, 1rem);
+
+  font-weight: 700;
+
+  letter-spacing:
+    0.06em;
+
+  text-transform: uppercase;
 }
 
 
-.nav-panel span {
-  writing-mode:
-    vertical-rl;
+/* ============================================================
+   LANDING NAVIGATION
+   ============================================================ */
 
-  text-orientation:
-    upright;
+
+/*
+  The four ray destinations terminate in one continuous
+  four-part navigation bar.
+*/
+.landing-nav {
+  position: relative;
+
+  z-index: 3;
+
+  grid-row: 2;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap:
+    var(--landing-nav-gap);
+
+  /*
+    Pull the heading row upward slightly so it overlaps the
+    bottom of the fanned ray geometry and hides any seam.
+  */
+  margin-top:
+    calc(0px - var(--landing-ray-nav-overlap));
+
+  padding-inline:
+    var(--landing-nav-inline);
+}
+
+
+/*
+  These are no longer cards.
+
+  Each link is simply the final horizontal portion of one ray.
+*/
+.nav-panel {
+  display: grid;
+
+  min-width: 0;
+
+  place-items: center;
+
+  padding:
+    6px
+    8px;
+}
+
+
+.nav-word {
+  display: flex;
+
+  min-width: 0;
+
+  align-items: center;
+  justify-content: center;
+}
+
+
+.nav-word img {
+  display: block;
+
+  width: auto;
+
+  max-width: 100%;
+
+  height:
+    clamp(22px, 2.2vw, 30px);
 }
 
 
@@ -791,12 +1264,19 @@ button {
   its position will trigger the first sticky navigation state.
 */
 .brand-gate {
+  position: relative;
+
+  z-index: 3;
+
+  grid-row: 3;
+
   display: grid;
 
   grid-template-columns:
     1fr auto 1fr;
 
-  min-height: 42px;
+  height:
+    var(--landing-brand-height);
 
   align-items: center;
 
@@ -867,52 +1347,6 @@ button {
 }
 
 
-/* ============================================================
-   FRAME GATES / SECTION BANNERS
-   ============================================================ */
-
-
-/*
-  Every frame ends in one of these.
-
-  The negative horizontal margin makes the gate extend through
-  the frame's padding until it touches the frame's side rails.
-
-  That creates the visual effect of the vertical ray TURNING
-  inward and becoming the horizontal section banner.
-*/
-.frame-gate {
-  display: flex;
-
-  min-height: 36px;
-
-  align-items: center;
-  justify-content: center;
-
-  margin-inline:
-    calc(0px - var(--ray-gap));
-
-  border-top:
-    var(--line-width)
-    solid
-    var(--ink);
-
-  border-bottom:
-    var(--line-width)
-    solid
-    var(--ink);
-
-  background:
-    var(--frame-color);
-
-  font-size:
-    clamp(1rem, 1.8vw, 1.25rem);
-
-  font-weight: 700;
-
-  line-height: 1;
-}
-
 
 /* ============================================================
    CONTENT SECTIONS
@@ -940,7 +1374,7 @@ button {
     var(--content-background);
 
   scroll-margin-top:
-    180px;
+    220px;
 }
 
 
@@ -969,7 +1403,7 @@ button {
 
 
 .section-contact {
-  min-height: 460px;
+  min-height: 1150px;
 
   background:
     var(--contact-frame);
@@ -1235,6 +1669,34 @@ button {
   :root {
     --outer-border-width: 5px;
     --ray-gap: 6px;
+
+    --q-mark-top: 4px;
+    --q-mark-size: 68px;
+
+    --landing-nav-gap: 0px;
+    --landing-nav-height: 44px;
+    --landing-brand-height: 38px;
+    --landing-nav-inline: 8px;
+
+    --landing-ray-width:
+      var(--ray-gap);
+
+    --landing-ray-start:
+      calc(
+        var(--q-mark-top)
+        + var(--q-mark-size)
+        - var(--landing-top-offset)
+        - var(--q-overlap-depth)
+      );
+
+    --landing-ray-turn-height: 54px;
+
+    --landing-video-width:
+      clamp(220px, 78vw, 420px);
+
+    --landing-next-gig-width:
+      clamp(210px, 70vw, 360px);
+
     --line-width: 0px;
   }
 
@@ -1250,28 +1712,77 @@ button {
 
 
   .q-mark {
-    top: 4px;
-
-    width: 68px;
-
     border-width: 4px;
   }
 
 
-  .landing-nav {
-    gap: 6px;
+  .landing-hero {
+    gap: 10px;
 
     padding:
-      86px
-      8px
-      42px;
+      82px
+      10px
+      calc(
+        var(--landing-ray-turn-height)
+        + 16px
+      );
+  }
+
+
+  .landing-video-block {
+    width:
+      var(--landing-video-width);
+  }
+
+
+  .landing-next-gig {
+    width:
+      var(--landing-next-gig-width);
+
+    min-height: 32px;
+
+    padding:
+      4px
+      8px;
   }
 
 
   .nav-panel {
-    min-height: 280px;
+    padding:
+      4px
+      2px;
+  }
 
-    font-size: 0.78rem;
+
+  .nav-word img {
+    height: 18px;
+  }
+
+
+  .sticky-primary-nav {
+    height:
+      var(--landing-nav-height);
+
+    min-height: 0;
+  }
+
+
+  .sticky-nav-link {
+    padding:
+      4px
+      2px;
+  }
+
+
+  .sticky-nav-word {
+    padding:
+      2px
+      3px;
+  }
+
+
+  .sticky-nav-word img {
+    height: 18px;
   }
 
 
@@ -1281,7 +1792,7 @@ button {
       18px;
 
     scroll-margin-top:
-      160px;
+      175px;
   }
 
 
