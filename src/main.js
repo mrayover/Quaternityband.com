@@ -801,4 +801,331 @@ if (
 
   updateStickyNavigation()
 
+  setupSectionScrolling({
+    qMark,
+    stickyPrimaryNav,
+    brandSticky,
+    contentSections,
+    updateStickyNavigation,
+  })
+
+}
+
+/* ============================================================
+   SECTION SCROLLING — EXISTING FRAME GEOMETRY IS UNCHANGED
+   ============================================================ */
+function setupSectionScrolling({
+  qMark,
+  stickyPrimaryNav,
+  brandSticky,
+  contentSections,
+  updateStickyNavigation,
+}) {
+  if (!stickyPrimaryNav || !brandSticky || !contentSections.length) {
+    return
+  }
+
+  const root = document.documentElement
+  const sections = contentSections.map(({ section }) => section)
+  const boxes = sections.map((section) => section.querySelector('.section-inner'))
+  if (boxes.some((box) => !box)) return
+
+  const contentBoxAt = (target) => {
+    const box = target instanceof Element
+      ? target.closest('.section-inner') : null
+    return boxes.includes(box) ? box : null
+  }
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+
+  // Interaction settings, not measurements of the existing design.
+  const GESTURE_GAP_MS = 180
+  const TRANSITION_MS = 360
+  const SWIPE_THRESHOLD_PX = 32
+  const EDGE_TOLERANCE_PX = 1
+
+  let stops = [0]
+  let moving = false
+  let destination = 0
+  let animation = 0
+  let settleTimer = 0
+  let resizeFrame = 0
+  let wheelGesture = null
+  let lastWheelTime = -Infinity
+  let touch = null
+
+  const closestStop = () => stops.reduce(
+    (best, stop, index) =>
+      Math.abs(stop - window.scrollY) < Math.abs(stops[best] - window.scrollY)
+        ? index : best,
+    0
+  )
+
+  const atEdge = (section, direction) => !section || (
+    direction > 0
+      ? section.scrollHeight - section.clientHeight - section.scrollTop
+        <= EDGE_TOLERANCE_PX
+      : section.scrollTop <= EDGE_TOLERANCE_PX
+  )
+
+  const go = (index, reset = false, instant = false) => {
+    index = Math.max(0, Math.min(stops.length - 1, index))
+    destination = index
+    window.cancelAnimationFrame(animation)
+    window.clearTimeout(settleTimer)
+
+    if (reset && index > 0) boxes[index - 1].scrollTop = 0
+
+    const start = window.scrollY
+    const target = stops[index]
+    const started = performance.now()
+    moving = true
+
+    const finish = () => {
+      window.scrollTo(0, target)
+      updateStickyNavigation()
+      moving = false
+    }
+
+    if (instant || reducedMotion.matches || Math.abs(target - start) <= 1) {
+      finish()
+      return
+    }
+
+    const tick = (now) => {
+      const progress = Math.min(1, (now - started) / TRANSITION_MS)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      window.scrollTo(0, start + (target - start) * eased)
+      if (progress < 1) animation = window.requestAnimationFrame(tick)
+      else finish()
+    }
+    animation = window.requestAnimationFrame(tick)
+  }
+
+  const measure = (keepPosition = true) => {
+    const index = moving ? destination : closestStop()
+    root.classList.add('section-scroll-ready')
+    updateStickyNavigation()
+    const styles = getComputedStyle(root)
+    const gap = Number.parseFloat(styles.getPropertyValue('--ray-gap'))
+    const overlap = Number.parseFloat(styles.getPropertyValue('--q-overlap-depth'))
+    const crownBottom = qMark.getBoundingClientRect().bottom - overlap
+      + stickyPrimaryNav.offsetHeight + brandSticky.offsetHeight
+
+    if (!Number.isFinite(gap) || !Number.isFinite(crownBottom)) return
+
+
+    const landingHero = document.querySelector('.landing-hero')
+    const nextGig = document.querySelector('.landing-next-gig')
+    if (landingHero && nextGig) {
+      const heroStyle = getComputedStyle(landingHero)
+      const videoHeight = Math.max(0,
+        landingHero.clientHeight
+        - Number.parseFloat(heroStyle.paddingTop)
+        - Number.parseFloat(heroStyle.paddingBottom)
+        - Number.parseFloat(heroStyle.rowGap)
+        - nextGig.getBoundingClientRect().height
+      )
+      landingHero.style.setProperty('--landing-video-height-limit', `${videoHeight}px`)
+    }
+
+    sections.forEach((section, position) => {
+      // Match the existing catchLine, including its accumulated bands.
+      // A 1px inset ensures fractional scroll positions cross that line.
+      const catchTop = crownBottom + position * gap - EDGE_TOLERANCE_PX
+      section.style.setProperty('--section-stop-top', `${catchTop}px`)
+      section.style.setProperty(
+        '--section-screen-height', `${Math.max(1, window.innerHeight - catchTop)}px`
+      )
+      const sectionStyle = getComputedStyle(section)
+      const contentHeight = Math.max(1,
+        window.innerHeight - catchTop
+        - Number.parseFloat(sectionStyle.paddingTop)
+        - Number.parseFloat(sectionStyle.paddingBottom)
+      )
+      section.style.setProperty('--section-content-height', `${contentHeight}px`)
+      section.removeAttribute('tabindex')
+      boxes[position].tabIndex = 0
+      boxes[position].setAttribute('role', 'region')
+      boxes[position].setAttribute('aria-label',
+        `${contentSections[position].name} content`)
+      section.scrollTop = 0
+
+      if (section.id === 'listen') {
+        const controls = section.querySelectorAll('.prototype-label, .media-tray')
+        const controlsHeight = Array.from(controls).reduce((total, control) => {
+          const controlStyle = getComputedStyle(control)
+          return total + control.getBoundingClientRect().height
+            + Number.parseFloat(controlStyle.marginTop)
+            + Number.parseFloat(controlStyle.marginBottom)
+        }, 0)
+        // Keep a usable media area on very short screens; overflow remains accessible.
+        section.style.setProperty('--listen-media-height',
+          `${Math.max(120, contentHeight - controlsHeight)}px`)
+      }
+    })
+    stops = [0, ...sections.map((section) =>
+      section.getBoundingClientRect().top + window.scrollY
+      - Number.parseFloat(section.style.getPropertyValue('--section-stop-top'))
+    )]
+    if (keepPosition) go(index, false, true)
+    updateStickyNavigation()
+  }
+
+  const beginGesture = (direction) => ({
+    index: closestStop(),
+    direction,
+    consumed: moving,
+  })
+
+  const moveGesture = (gesture, delta, allowTransition = true) => {
+    if (gesture.consumed || moving || !allowTransition) return
+    const direction = Math.sign(delta)
+    gesture.consumed = true
+    if (Math.abs(window.scrollY - stops[gesture.index]) > EDGE_TOLERANCE_PX) {
+      go(gesture.index)
+    } else if (direction === gesture.direction) {
+      go(gesture.index + direction)
+    }
+  }
+
+  window.addEventListener('wheel', (event) => {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || !event.cancelable) return
+    if (!event.deltaY || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return
+
+    const direction = Math.sign(event.deltaY)
+    const now = performance.now()
+    const box = contentBoxAt(event.target)
+    if (box) {
+      // Native scrolling inside the box, including native wheel units.
+      // Block chaining at BOTH edges, even when the box has no overflow.
+      if (moving || atEdge(box, direction)) event.preventDefault()
+      wheelGesture = { consumed: true }
+      lastWheelTime = now
+      return
+    }
+
+    event.preventDefault()
+    if (!wheelGesture || now - lastWheelTime > GESTURE_GAP_MS) {
+      wheelGesture = beginGesture(direction)
+    }
+    lastWheelTime = now
+    moveGesture(wheelGesture, event.deltaY)
+  }, { passive: false })
+
+  window.addEventListener('touchstart', (event) => {
+    touch = event.touches.length === 1 ? {
+      x: event.touches[0].clientX,
+      y: event.touches[0].clientY,
+      lastY: event.touches[0].clientY,
+      box: contentBoxAt(event.target),
+      axis: null,
+      gesture: null,
+    } : null
+  }, { passive: true })
+
+  window.addEventListener('touchmove', (event) => {
+    if (!touch || event.touches.length !== 1) return
+    const point = event.touches[0]
+    const dx = touch.x - point.clientX
+    const dy = touch.y - point.clientY
+
+    const deltaY = touch.lastY - point.clientY
+    touch.lastY = point.clientY
+
+    if (touch.box) {
+      // The browser owns internal touch scrolling and its momentum.
+      // An edge never hands this swipe to section navigation.
+      if (event.cancelable && (moving ||
+        (Math.abs(dy) > Math.abs(dx) && atEdge(touch.box, Math.sign(deltaY))))) {
+        event.preventDefault()
+      }
+      return
+    }
+
+    if (!touch.axis && (dx || dy)) {
+      touch.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'
+      touch.gesture = beginGesture(Math.sign(dy))
+    }
+    if (touch.axis !== 'y' || !event.cancelable) return
+    event.preventDefault()
+    moveGesture(touch.gesture, dy, Math.abs(dy) >= SWIPE_THRESHOLD_PX)
+  }, { passive: false })
+
+  const endTouch = () => { touch = null }
+  window.addEventListener('touchend', endTouch, { passive: true })
+  window.addEventListener('touchcancel', endTouch, { passive: true })
+
+  document.addEventListener('keydown', (event) => {
+    if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return
+    if (event.target.closest('input, textarea, select, [contenteditable="true"]')) return
+    if (event.key === ' ' && event.target.closest('button, a')) return
+    const direction = ['ArrowDown', 'PageDown', ' '].includes(event.key)
+      ? (event.key === ' ' && event.shiftKey ? -1 : 1)
+      : ['ArrowUp', 'PageUp'].includes(event.key) ? -1 : 0
+    if (!direction && !['Home', 'End'].includes(event.key)) return
+
+    const box = contentBoxAt(event.target)
+    if (box) {
+      const edgeDirection = event.key === 'Home' ? -1
+        : event.key === 'End' ? 1 : direction
+      if (moving || atEdge(box, edgeDirection)) event.preventDefault()
+      return
+    }
+
+    event.preventDefault()
+    if (event.repeat || moving) return
+    if (event.key === 'Home' || event.key === 'End') {
+      go(event.key === 'End' ? stops.length - 1 : 0)
+    } else moveGesture(beginGesture(direction), direction)
+  })
+
+  const hashIndex = () => location.hash === '#top' || !location.hash ? 0
+    : sections.findIndex((section) => `#${section.id}` === location.hash) + 1
+
+  document.addEventListener('click', (event) => {
+    if (event.defaultPrevented || event.button !== 0 || event.ctrlKey
+      || event.metaKey || event.shiftKey || event.altKey) return
+    const link = event.target.closest('a[href]')
+    if (!link || link.hasAttribute('download') || link.target === '_blank') return
+    const hash = link.getAttribute('href')
+    const index = hash === '#top' ? 0
+      : sections.findIndex((section) => `#${section.id}` === hash) + 1
+    if (hash !== '#top' && index === 0) return
+    event.preventDefault()
+    if (location.hash !== hash) history.pushState(null, '', hash)
+    wheelGesture = null
+    go(index, true)
+  })
+
+  window.addEventListener('hashchange', () => go(hashIndex(), true))
+  window.addEventListener('popstate', () => go(hashIndex(), true))
+
+  // Scrollbar dragging and focus-driven document scrolling still settle
+  // on a section. The document remains the original scrolling page.
+  window.addEventListener('scroll', () => {
+    window.clearTimeout(settleTimer)
+    if (!moving) settleTimer = window.setTimeout(() => {
+      if (!touch && Math.abs(window.scrollY - stops[closestStop()]) > 1) {
+        go(closestStop())
+      }
+    }, GESTURE_GAP_MS)
+  }, { passive: true })
+
+  const queueMeasure = () => {
+    window.cancelAnimationFrame(resizeFrame)
+    resizeFrame = window.requestAnimationFrame(() => measure())
+  }
+  window.addEventListener('resize', queueMeasure)
+  window.addEventListener('load', queueMeasure)
+  if ('ResizeObserver' in window) {
+    const observer = new ResizeObserver(queueMeasure)
+    observer.observe(stickyPrimaryNav)
+    observer.observe(brandSticky)
+    observer.observe(qMark)
+    const landing = document.querySelector('.landing')
+    if (landing) observer.observe(landing)
+  }
+
+  measure(false)
+  go(location.hash ? hashIndex() : closestStop(), false, true)
 }

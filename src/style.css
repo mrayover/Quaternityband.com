@@ -1630,9 +1630,151 @@ button {
 
 
 /* ============================================================
+   SCREEN-SIZED SECTIONS — ENABLED ONLY AFTER JS MEASUREMENT
+   ============================================================ */
+.section-scroll-ready {
+  scroll-behavior: auto;
+  touch-action: auto;
+}
+
+.section-scroll-ready .content-section {
+  height: var(--section-screen-height);
+  min-height: 0;
+  overflow: hidden;
+  scroll-margin-top: var(--section-stop-top);
+}
+
+.section-scroll-ready .content-section > .section-inner {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  touch-action: auto;
+  scrollbar-width: auto;
+}
+
+.section-scroll-ready .about-layout {
+  align-content: start;
+  align-items: start;
+}
+
+.section-scroll-ready .member-grid {
+  /* Two 4:5 rows with the existing 14px gap:
+     required width = 0.8 * available height + 0.2 * gap. */
+  width: min(100%, calc(var(--section-content-height) * 0.8 + 2.8px));
+  justify-self: center;
+}
+
+.section-scroll-ready .section-listen > .section-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.section-scroll-ready .section-listen .prototype-label,
+.section-scroll-ready .section-listen .media-tray {
+  flex: none;
+  width: 100%;
+}
+
+.section-scroll-ready .featured-media {
+  flex: none;
+  width: min(100%, calc(var(--listen-media-height) * 16 / 9));
+  aspect-ratio: 16 / 9;
+}
+
+.section-scroll-ready .contact-placeholder {
+  align-content: safe center;
+}
+
+/* ============================================================
+   LANDING FIT AND LARGER QUATERNITY / SOCIAL BANNER
+   ============================================================ */
+:root.section-scroll-ready {
+  --landing-brand-height: 63px;
+}
+
+.section-scroll-ready .landing {
+  height: calc(100dvh - var(--landing-top-offset));
+  min-height: 0;
+}
+
+.section-scroll-ready .landing-hero {
+  min-height: 0;
+  align-content: start;
+  padding-top: max(
+    12px,
+    calc(
+      var(--q-mark-top) + var(--q-mark-size)
+      - var(--landing-top-offset) + 12px
+    )
+  );
+}
+
+.section-scroll-ready .landing-video-block {
+  width: min(
+    var(--landing-video-width),
+    calc(var(--landing-video-height-limit) * 16 / 9),
+    100%
+  );
+}
+
+.section-scroll-ready .brand-name img {
+  width: clamp(195px, 24vw, 285px);
+  max-width: 100%;
+}
+
+.section-scroll-ready .brand-social {
+  font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+}
+
+@media (max-width: 720px) {
+  :root.section-scroll-ready {
+    --landing-brand-height: 76px;
+  }
+
+  .section-scroll-ready .brand-gate,
+  .section-scroll-ready .sticky-item-brand {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+  }
+
+  .section-scroll-ready .brand-name {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .section-scroll-ready .brand-social-youtube {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .section-scroll-ready .brand-social-instagram {
+    grid-column: 2;
+    grid-row: 2;
+  }
+}
+
+
+/* ============================================================
+   GIGS — HEADING ABOVE THE SCROLL BOX
+   ============================================================ */
+.section-scroll-ready .section-gigs {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.section-gigs > .gigs-heading {
+  width: min(100%, var(--content-max-width));
+  margin-inline: auto;
+}
+
+
+/* ============================================================
    ACCESSIBILITY
    ============================================================ */
-
 
 .visually-hidden {
   position: absolute;
