@@ -147,7 +147,7 @@
     Landing content dimensions.
   */
   --landing-video-width:
-    clamp(320px, 72vw, 820px);
+    clamp(360px, 72vw, 820px);
 
   --landing-next-gig-width:
     clamp(220px, 32vw, 380px);
@@ -1751,7 +1751,10 @@ button {
 .section-scroll-ready .landing-video-block {
   width: min(
     var(--landing-video-width),
-    calc(var(--landing-video-height-limit) * 16 / 9),
+    calc(
+      (var(--landing-video-height-limit) + 48px)
+      * 16 / 9
+    ),
     100%
   );
 }
