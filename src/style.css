@@ -86,14 +86,24 @@
     clamp(70px, 8vw, 100px);
 
   /*
-    Amount that the ray/nav geometry rises behind the lower
+    Amount that the persistent navigation overlaps the lower
     edge of the Q.
-
-    Using one ray thickness keeps the relationship proportional
-    on desktop and mobile.
   */
   --q-overlap-depth:
     var(--ray-gap);
+
+  /*
+    Small extra overlap for the persistent navigation so its
+    colored top edge disappears behind the bottom of the Q.
+  */
+  --sticky-nav-lift: 4px;
+
+  /*
+    Small additional lift used ONLY by the four landing rays.
+    This does not move the sticky navigation or section stops.
+  */
+  --landing-ray-lift:
+    calc(var(--ray-gap) / 2);
 
   /*
     Width of each of the four vertical rays emerging beneath Q.
@@ -117,6 +127,7 @@
       + var(--q-mark-size)
       - var(--landing-top-offset)
       - var(--q-overlap-depth)
+      - var(--landing-ray-lift)
     );
 
   /*
@@ -136,10 +147,10 @@
     Landing content dimensions.
   */
   --landing-video-width:
-    clamp(260px, 58vw, 620px);
+    clamp(320px, 72vw, 820px);
 
   --landing-next-gig-width:
-    clamp(240px, 44vw, 500px);
+    clamp(220px, 32vw, 380px);
 
   /*
     Consistent line weight for the internal geometry.
@@ -334,21 +345,18 @@ button {
 
   place-items: center;
 
-  border:
-    5px solid
-    var(--ink);
-
-  border-radius: 50%;
-
   background:
-    var(--content-background);
+    transparent;
+}
 
-  font-size:
-    clamp(2rem, 4vw, 3.25rem);
 
-  font-weight: 800;
+.q-mark img {
+  display: block;
 
-  line-height: 1;
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
 }
 
 /*
@@ -917,13 +925,28 @@ button {
     polygon(
       var(--stem-left) 0,
       var(--stem-right) 0,
+
       var(--stem-right)
         calc(
           100%
           - var(--landing-ray-turn-height)
         ),
+
+      var(--cell-right)
+        calc(
+          100%
+          - var(--landing-ray-nav-overlap)
+        ),
+
       var(--cell-right) 100%,
       var(--cell-left) 100%,
+
+      var(--cell-left)
+        calc(
+          100%
+          - var(--landing-ray-nav-overlap)
+        ),
+
       var(--stem-left)
         calc(
           100%
@@ -1042,14 +1065,14 @@ button {
   justify-items: center;
 
   gap:
-    clamp(12px, 2vw, 20px);
+    clamp(22px, 3vw, 32px);
 
   padding:
     clamp(72px, 8vw, 110px)
     18px
     calc(
       var(--landing-ray-turn-height)
-      + clamp(18px, 3vw, 36px)
+      + clamp(4px, 1vw, 12px)
     );
 }
 
@@ -1097,6 +1120,7 @@ button {
   border: 0;
 
   object-fit: cover;
+  object-position: center 55%;
 }
 
 
@@ -1130,13 +1154,13 @@ button {
     var(--landing-next-gig-width);
 
   min-height:
-    clamp(34px, 4vw, 46px);
+    clamp(30px, 3vw, 40px);
 
   place-items: center;
 
   padding:
-    6px
-    12px;
+    4px
+    10px;
 
   border:
     2px solid
@@ -1146,7 +1170,7 @@ button {
     var(--content-background);
 
   font-size:
-    clamp(0.8rem, 1.4vw, 1rem);
+    clamp(0.75rem, 1.2vw, 0.9rem);
 
   font-weight: 700;
 
@@ -1638,13 +1662,25 @@ button {
 }
 
 .section-scroll-ready .content-section {
+  --section-edge-space: 16px;
+  --section-title-size: clamp(1.6rem, 4vw, 3rem);
+
   height: var(--section-screen-height);
   min-height: 0;
+  padding:
+    calc(
+      var(--ray-gap) + 1px
+      + var(--section-title-size) * 1.1
+      + var(--section-edge-space)
+    )
+    var(--section-edge-space)
+    var(--section-edge-space);
   overflow: hidden;
   scroll-margin-top: var(--section-stop-top);
 }
 
 .section-scroll-ready .content-section > .section-inner {
+  width: 100%;
   height: 100%;
   max-height: 100%;
   min-height: 0;
@@ -1759,16 +1795,20 @@ button {
 
 
 /* ============================================================
-   GIGS — HEADING ABOVE THE SCROLL BOX
+   SECTION TITLES — INSIDE THE EXISTING TOP HEADING BANDS
    ============================================================ */
-.section-scroll-ready .section-gigs {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-}
-
-.section-gigs > .gigs-heading {
-  width: min(100%, var(--content-max-width));
-  margin-inline: auto;
+.section-scroll-ready .content-section > .section-heading {
+  position: absolute;
+  top: 0;
+  left: var(--section-heading-inset);
+  right: var(--section-heading-inset);
+  width: auto;
+  height: var(--section-heading-height);
+  margin: 0;
+  padding-top: calc(var(--ray-gap) + 1px);
+  display: flex;
+  align-items: center;
+  line-height: 1.1;
 }
 
 
@@ -1850,11 +1890,6 @@ button {
 
   .site-frame {
     width: 100%;
-  }
-
-
-  .q-mark {
-    border-width: 4px;
   }
 
 

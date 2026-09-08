@@ -323,6 +323,14 @@ if (
       ) || 0
 
 
+    const stickyNavLift =
+      Number.parseFloat(
+        rootStyles.getPropertyValue(
+          '--sticky-nav-lift'
+        )
+      ) || 0
+
+
     /*
       The ghost is exactly one frame thickness.
 
@@ -340,6 +348,7 @@ if (
     const navTop =
       shelfTop
       - qOverlapDepth
+      - stickyNavLift
 
 
     qShelf.style.top =
@@ -895,6 +904,7 @@ function setupSectionScrolling({
       const progress = Math.min(1, (now - started) / TRANSITION_MS)
       const eased = 1 - Math.pow(1 - progress, 3)
       window.scrollTo(0, start + (target - start) * eased)
+      updateStickyNavigation()
       if (progress < 1) animation = window.requestAnimationFrame(tick)
       else finish()
     }
@@ -908,8 +918,15 @@ function setupSectionScrolling({
     const styles = getComputedStyle(root)
     const gap = Number.parseFloat(styles.getPropertyValue('--ray-gap'))
     const overlap = Number.parseFloat(styles.getPropertyValue('--q-overlap-depth'))
-    const crownBottom = qMark.getBoundingClientRect().bottom - overlap
-      + stickyPrimaryNav.offsetHeight + brandSticky.offsetHeight
+    const stickyNavLift =
+      Number.parseFloat(styles.getPropertyValue('--sticky-nav-lift')) || 0
+
+    const crownBottom =
+      qMark.getBoundingClientRect().bottom
+      - overlap
+      - stickyNavLift
+      + stickyPrimaryNav.offsetHeight
+      + brandSticky.offsetHeight
 
     if (!Number.isFinite(gap) || !Number.isFinite(crownBottom)) return
 
@@ -937,6 +954,8 @@ function setupSectionScrolling({
         '--section-screen-height', `${Math.max(1, window.innerHeight - catchTop)}px`
       )
       const sectionStyle = getComputedStyle(section)
+      section.style.setProperty('--section-heading-height', sectionStyle.paddingTop)
+      section.style.setProperty('--section-heading-inset', sectionStyle.paddingLeft)
       const contentHeight = Math.max(1,
         window.innerHeight - catchTop
         - Number.parseFloat(sectionStyle.paddingTop)
@@ -951,7 +970,7 @@ function setupSectionScrolling({
       section.scrollTop = 0
 
       if (section.id === 'listen') {
-        const controls = section.querySelectorAll('.prototype-label, .media-tray')
+        const controls = section.querySelectorAll('.media-tray')
         const controlsHeight = Array.from(controls).reduce((total, control) => {
           const controlStyle = getComputedStyle(control)
           return total + control.getBoundingClientRect().height
