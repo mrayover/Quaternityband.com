@@ -331,10 +331,10 @@ button {
   top:
     var(--q-mark-top);
 
-  left: 50%;
+  left: 0;
+  right: 0;
 
-  transform:
-    translateX(-50%);
+  margin-inline: auto;
 
   display: grid;
 
