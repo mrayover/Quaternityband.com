@@ -1,0 +1,64 @@
+:root { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #191919; background: #f3f3f3; font-synthesis: none; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+[hidden] { display: none !important; }
+button, input, select, textarea { font: inherit; }
+button, .header-actions a { border: 1px solid #aaa; border-radius: 6px; padding: 10px 14px; background: white; color: #191919; cursor: pointer; text-decoration: none; font-weight: 650; }
+button:hover, .header-actions a:hover { background: #ececec; }
+button:disabled { opacity: .5; cursor: wait; }
+input, select, textarea { width: 100%; min-width: 0; padding: 10px; border: 1px solid #999; border-radius: 5px; background: white; color: inherit; }
+input[type="range"] { padding: 0; accent-color: #242424; }
+input[type="file"] { font-size: 14px; }
+label { display: grid; gap: 7px; font-size: 14px; font-weight: 650; }
+label output { font-weight: 400; }
+textarea { resize: vertical; }
+:focus-visible { outline: 3px solid #9b4b09; outline-offset: 3px; }
+h1, h2, h3, p { margin-top: 0; }
+h1 { font-size: 30px; margin-bottom: 0; }
+h2 { font-size: 24px; margin-bottom: 6px; }
+h3 { font-size: 18px; margin-bottom: 16px; }
+p { line-height: 1.5; }
+.writer-header { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 24px max(24px, calc((100vw - 1240px) / 2)); background: #ffde59; border-bottom: 2px solid #191919; }
+.eyebrow { font-size: 13px; font-weight: 800; letter-spacing: .13em; margin-bottom: 4px; }
+.header-actions, .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.status-bar { max-width: 1240px; margin: auto; min-height: 55px; padding: 16px 24px; display: flex; gap: 16px; justify-content: space-between; font-size: 14px; }
+#status[data-error="true"] { color: #a41414; font-weight: 650; }
+#unsaved { color: #713100; font-weight: 650; }
+.tabs { max-width: 1192px; margin: 0 auto; display: flex; gap: 6px; border-bottom: 1px solid #bbb; padding: 0 0 12px; }
+.tabs button { min-width: 110px; }
+.tabs button[aria-current="page"] { background: #191919; border-color: #191919; color: white; }
+main { max-width: 1240px; margin: auto; padding: 24px; }
+.section-heading { margin-bottom: 24px; }
+.section-heading p { color: #555; font-size: 15px; }
+.two-column { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.panel { border: 1px solid #c9c9c9; border-radius: 10px; background: #fff; padding: 24px; min-width: 0; }
+.fields { display: grid; gap: 18px; }
+.fields h3 { margin: 0; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.hint { color: #595959; font-size: 14px; margin-bottom: 0; overflow-wrap: anywhere; }
+.optional { font-weight: 400; color: #666; }
+button.primary { background: #191919; color: white; border-color: #191919; }
+button.primary:hover { background: #383838; }
+.hero-preview { width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #ffde59; }
+.hero-preview img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.preview-panel h3 { margin-top: 28px; margin-bottom: 8px; }
+.small-preview { max-width: 100%; max-height: 240px; object-fit: contain; justify-self: start; }
+.saved-list { display: grid; gap: 14px; margin-top: 18px; max-height: 780px; overflow: auto; }
+.saved-record { border: 1px solid #ccc; border-radius: 6px; padding: 16px; overflow-wrap: anywhere; }
+.saved-record h4 { font-size: 16px; margin: 0 0 6px; }
+.saved-record p { font-size: 14px; margin-bottom: 12px; color: #555; white-space: pre-line; }
+.saved-record .actions button { font-size: 14px; padding: 7px 11px; }
+.saved-record .delete { color: #9b1c1c; }
+footer { max-width: 1240px; margin: 0 auto; padding: 10px 24px 32px; color: #595959; font-size: 14px; }
+@media (max-width: 800px) {
+  .two-column { grid-template-columns: 1fr; }
+  .writer-header { align-items: start; flex-direction: column; padding: 20px; }
+  .tabs { margin: 0 20px; }
+  main { padding: 20px; }
+  .panel { padding: 18px; }
+  .status-bar { flex-direction: column; gap: 6px; }
+}
+@media (max-width: 440px) {
+  .field-row { grid-template-columns: 1fr; }
+  .tabs button { min-width: 0; flex: 1; }
+}

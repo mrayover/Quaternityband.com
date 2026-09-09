@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quaternity · Writer</title>
+    <link rel="stylesheet" href="/__writer/style.css" />
+  </head>
+  <body>
+    <header class="writer-header">
+      <div><p class="eyebrow">QUATERNITY</p><h1>Writer</h1></div>
+      <div class="header-actions">
+        <button id="reload" type="button">Reload from disk</button>
+        <a href="/" target="quaternity-preview">Preview site ↗</a>
+      </div>
+    </header>
+    <div class="status-bar"><span id="status" role="status" aria-live="polite">Loading your files…</span><span id="unsaved"></span></div>
+    <nav class="tabs" aria-label="Writer sections">
+      <button type="button" data-tab="home" aria-current="page">Home</button>
+      <button type="button" data-tab="gigs">Gigs</button>
+      <button type="button" data-tab="venues">Venues</button>
+    </nav>
+    <main id="editor" inert>
+      <section id="home-panel">
+        <div class="section-heading"><h2>Home image</h2><p>Save here, then check the existing layout in Preview site.</p></div>
+        <form id="home-form" class="two-column">
+          <div class="panel fields">
+            <label>Image<select name="heroImage" data-image-picker="home" required></select></label>
+            <label class="upload">Upload an image<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" data-upload="home" data-target="heroImage" /></label>
+            <p class="hint">PNG, JPG, WebP or GIF · up to 15 MB. Upload, then save to use it.</p>
+            <label>Image description<input name="heroAlt" maxlength="500" required /></label>
+            <label>Image link <span class="optional">optional</span><input name="heroLink" type="url" placeholder="https://…" /></label>
+            <label>Horizontal position <output id="x-value">50%</output><input name="heroX" type="range" min="0" max="100" value="50" /></label>
+            <label>Vertical position <output id="y-value">55%</output><input name="heroY" type="range" min="0" max="100" value="55" /></label>
+            <label>Message when no gigs are scheduled<input name="noGigText" maxlength="100" required /></label>
+            <button class="primary" type="submit">Save Home</button>
+          </div>
+          <aside class="panel preview-panel">
+            <div class="hero-preview"><img id="hero-preview" alt="Home image preview" /></div>
+            <p class="hint">16:9 crop preview. The site keeps its existing image size and framing.</p>
+            <h3>Next Gig</h3><p id="next-preview">No gigs scheduled.</p>
+            <p class="hint">Filled from Gigs automatically. Click the Home listing to open the Gigs section.</p>
+          </aside>
+        </form>
+      </section>
+      <section id="gigs-panel" hidden>
+        <div class="section-heading"><h2>Gigs</h2><p>Dates and times use Pacific time. Past gigs stay saved and leave the upcoming list automatically.</p></div>
+        <div class="two-column">
+          <form id="gig-form" class="panel fields">
+            <h3 id="gig-form-title">Add gig</h3>
+            <label>Event title<input name="title" maxlength="200" value="Quaternity" /></label>
+            <div class="field-row">
+              <label>Date<input name="date" type="date" min="2000-01-01" required /></label>
+              <label>Status<select name="status"><option value="scheduled">Scheduled</option><option value="hidden">Hidden / draft</option><option value="cancelled">Cancelled</option></select></label>
+            </div>
+            <div class="field-row">
+              <label>Start time<input name="startTime" type="time" required /></label>
+              <label>End time <span class="optional">optional</span><input name="endTime" type="time" /></label>
+            </div>
+            <p class="hint">No end time: show until midnight. An end time earlier than the start means the following day.</p>
+            <label>Venue<select name="venueId" required></select></label>
+            <p id="gig-venue-info" class="hint"></p>
+            <label>Details / lineup<textarea name="details" rows="4" maxlength="6000" placeholder="Cover, age restriction, special guests, or other show details"></textarea></label>
+            <label>Event / ticket link <span class="optional">optional</span><input name="link" type="url" placeholder="https://…" /></label>
+            <label>Flyer <span class="optional">optional</span><select name="flyer" data-image-picker="gigs"></select></label>
+            <label class="upload">Upload a flyer<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" data-upload="gigs" data-target="flyer" /></label>
+            <img id="flyer-preview" class="small-preview" alt="Selected gig flyer" hidden />
+            <div class="actions"><button class="primary" type="submit" id="save-gig">Add gig</button><button type="button" id="new-gig">Clear / new gig</button></div>
+          </form>
+          <div class="panel"><h3>Saved gigs</h3><div id="gig-list" class="saved-list"></div></div>
+        </div>
+      </section>
+      <section id="venues-panel" hidden>
+        <div class="section-heading"><h2>Venues</h2><p>Your starting list comes from FMC. Venue changes here apply to Quaternity only.</p></div>
+        <div class="two-column">
+          <form id="venue-form" class="panel fields">
+            <h3 id="venue-form-title">Add venue</h3>
+            <label>Venue name<input name="name" maxlength="200" required /></label>
+            <label>City <span class="optional">optional</span><input name="city" maxlength="100" /></label>
+            <label>Address<input name="address" maxlength="400" /></label>
+            <label>Map link<input name="mapLink" type="url" placeholder="https://…" /></label>
+            <label>Website<input name="website" type="url" placeholder="https://…" /></label>
+            <div class="field-row">
+              <label>Social platform<select name="socialType"><option value="ig">Instagram</option><option value="fb">Facebook</option></select></label>
+              <label>Social link<input name="socialUrl" type="url" placeholder="https://…" /></label>
+            </div>
+            <label>Logo <span class="optional">optional</span><select name="logo" data-image-picker="venues"></select></label>
+            <label class="upload">Upload a logo<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" data-upload="venues" data-target="logo" /></label>
+            <img id="logo-preview" class="small-preview" alt="Selected venue logo" hidden />
+            <div class="actions"><button class="primary" type="submit" id="save-venue">Add venue</button><button type="button" id="new-venue">Clear / new venue</button></div>
+          </form>
+          <div class="panel"><label>Find a venue<input id="venue-search" type="search" placeholder="Name or address" /></label><div id="venue-list" class="saved-list"></div></div>
+        </div>
+      </section>
+    </main>
+    <footer>Changes save on this computer. Review the site, then commit and push to publish.</footer>
+    <script type="module" src="/__writer/app.js"></script>
+  </body>
+</html>

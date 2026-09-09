@@ -1,0 +1,10 @@
+{
+  "home": {
+    "heroImage": "/assets/Images/Hero/BespokeHero.png",
+    "heroAlt": "Quaternity performing live",
+    "heroLink": "",
+    "heroX": 50,
+    "heroY": 55,
+    "noGigText": "New dates coming soon"
+  }
+}
