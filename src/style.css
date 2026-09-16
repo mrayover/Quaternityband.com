@@ -1663,14 +1663,12 @@ button {
 
 .section-scroll-ready .content-section {
   --section-edge-space: 16px;
-  --section-title-size: clamp(1.6rem, 4vw, 3rem);
 
   height: var(--section-screen-height);
   min-height: 0;
   padding:
     calc(
       var(--ray-gap) + 1px
-      + var(--section-title-size) * 1.1
       + var(--section-edge-space)
     )
     var(--section-edge-space)
@@ -1708,7 +1706,6 @@ button {
   align-items: center;
 }
 
-.section-scroll-ready .section-listen .prototype-label,
 .section-scroll-ready .section-listen .media-tray {
   flex: none;
   width: 100%;
@@ -1798,27 +1795,11 @@ button {
 
 
 /* ============================================================
-   SECTION TITLES — INSIDE THE EXISTING TOP HEADING BANDS
-   ============================================================ */
-.section-scroll-ready .content-section > .section-heading {
-  position: absolute;
-  top: 0;
-  left: var(--section-heading-inset);
-  right: var(--section-heading-inset);
-  width: auto;
-  height: var(--section-heading-height);
-  margin: 0;
-  padding-top: calc(var(--ray-gap) + 1px);
-  display: flex;
-  align-items: center;
-  line-height: 1.1;
-}
-
-
-/* ============================================================
    ACCESSIBILITY
    ============================================================ */
 
+/* Keep section headings available to assistive technology without a visible band. */
+.content-section > .section-heading,
 .visually-hidden {
   position: absolute;
 

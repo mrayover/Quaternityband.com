@@ -956,8 +956,6 @@ function setupSectionScrolling({
         '--section-screen-height', `${Math.max(1, window.innerHeight - catchTop)}px`
       )
       const sectionStyle = getComputedStyle(section)
-      section.style.setProperty('--section-heading-height', sectionStyle.paddingTop)
-      section.style.setProperty('--section-heading-inset', sectionStyle.paddingLeft)
       const contentHeight = Math.max(1,
         window.innerHeight - catchTop
         - Number.parseFloat(sectionStyle.paddingTop)
