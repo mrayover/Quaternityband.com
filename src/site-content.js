@@ -3,6 +3,7 @@ import events from './data/events.json'
 import venues from './data/venues.json'
 import { upcomingEvents, displayDate, displayTime } from './gig-data.js'
 import './site-content.css'
+import './about.js'
 
 const element = (tag, className, text) => {
   const node = document.createElement(tag)

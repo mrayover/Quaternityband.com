@@ -1,0 +1,42 @@
+[
+  {
+    "id": "band",
+    "name": "Quaternity",
+    "role": "The band",
+    "image": "",
+    "alt": "",
+    "bio": "Band biography coming soon."
+  },
+  {
+    "id": "member-1",
+    "name": "Member 1",
+    "role": "Saxophone / EWI",
+    "image": "",
+    "alt": "",
+    "bio": "Member biography coming soon."
+  },
+  {
+    "id": "member-2",
+    "name": "Member 2",
+    "role": "Guitar",
+    "image": "",
+    "alt": "",
+    "bio": "Member biography coming soon."
+  },
+  {
+    "id": "member-3",
+    "name": "Member 3",
+    "role": "Bass",
+    "image": "",
+    "alt": "",
+    "bio": "Member biography coming soon."
+  },
+  {
+    "id": "member-4",
+    "name": "Member 4",
+    "role": "Drums",
+    "image": "",
+    "alt": "",
+    "bio": "Member biography coming soon."
+  }
+]

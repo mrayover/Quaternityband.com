@@ -24,7 +24,7 @@ p { line-height: 1.5; }
 .status-bar { max-width: 1240px; margin: auto; min-height: 55px; padding: 16px 24px; display: flex; gap: 16px; justify-content: space-between; font-size: 14px; }
 #status[data-error="true"] { color: #a41414; font-weight: 650; }
 #unsaved { color: #713100; font-weight: 650; }
-.tabs { max-width: 1192px; margin: 0 auto; display: flex; gap: 6px; border-bottom: 1px solid #bbb; padding: 0 0 12px; }
+.tabs { max-width: 1192px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid #bbb; padding: 0 0 12px; }
 .tabs button { min-width: 110px; }
 .tabs button[aria-current="page"] { background: #191919; border-color: #191919; color: white; }
 main { max-width: 1240px; margin: auto; padding: 24px; }

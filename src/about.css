@@ -1,0 +1,92 @@
+/* About contents only: retain the existing section, heading strip and rays. */
+#about .about-layout {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: clamp(20px, 4vw, 64px);
+  align-items: start;
+}
+#about .about-copy, #about .about-gallery { min-width: 0; }
+#about .about-copy { overflow-wrap: anywhere; }
+#about .about-copy h3 { margin: 0 0 8px; font-size: clamp(1.4rem, 2.4vw, 2rem); }
+#about .about-role { margin: 0 0 16px; font-weight: 700; }
+#about [data-about-bio] p { margin: 0 0 1em; white-space: pre-wrap; }
+#about .about-photo-frame {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  max-height: clamp(180px, calc(var(--section-content-height, 500px) - 112px), 540px);
+  background: rgb(255 255 255 / 18%);
+  border: 2px solid rgb(0 0 0 / 55%);
+}
+#about .about-photo { position: absolute; inset: 0; }
+#about .about-photo img { display: block; width: 100%; height: 100%; object-fit: contain; }
+#about .about-photo-placeholder {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  text-align: center;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+#about .about-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 52px;
+  border: 0;
+  background: rgb(0 0 0 / 80%);
+  color: white;
+  font: inherit;
+  font-size: 36px;
+  line-height: 1;
+  cursor: pointer;
+}
+#about .about-previous { left: 0; }
+#about .about-next { right: 0; }
+#about .about-tray {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: 6px 3px 8px;
+  margin-top: 8px;
+}
+#about .about-thumbnail {
+  position: relative;
+  flex: 0 0 calc((100% - 32px) / 5);
+  min-width: 64px;
+  height: 84px;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid transparent;
+  background: rgb(255 255 255 / 25%);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+#about .about-thumbnail img { display: block; width: 100%; height: 100%; object-fit: cover; }
+#about .about-thumbnail .about-photo-placeholder { padding: 4px 4px 24px; font-size: 12px; }
+#about .about-thumbnail-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgb(0 0 0 / 85%);
+  color: white;
+  padding: 3px;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#about .about-thumbnail[aria-pressed="true"] { border-color: black; box-shadow: 0 0 0 1px black; }
+#about button:focus-visible { outline: 3px solid black; outline-offset: 2px; }
+@media (max-width: 720px) {
+  #about .about-layout { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  #about .about-gallery { grid-row: 1; }
+  #about .about-copy { grid-row: 2; }
+  #about .about-photo-frame { height: auto; aspect-ratio: 4 / 3; }
+  #about .about-thumbnail { height: 68px; }
+}

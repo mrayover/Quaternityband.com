@@ -2,8 +2,11 @@ import { upcomingEvents, displayDate, displayTime } from '/src/gig-data.js'
 
 const $ = (selector) => document.querySelector(selector)
 const homeForm = $('#home-form'), gigForm = $('#gig-form'), venueForm = $('#venue-form')
+const aboutForm = $('#about-form')
+let aboutId = 'band'
 const dirty = new Set()
 let state, gigId = '', venueId = '', busy = false
+
 
 function status(message, error = false) {
   $('#status').textContent = message
@@ -71,12 +74,17 @@ function updateVenueInfo() {
 }
 
 function previewImages() {
+  const about = fields(aboutForm)
+  $('#about-preview-name').textContent = about.name
+  $('#about-preview-role').textContent = about.role
+  $('#about-preview-bio').textContent = about.bio
+  aboutForm.elements.alt.required = Boolean(about.image)
   const home = fields(homeForm)
   $('#hero-preview').src = home.heroImage || ''
   $('#hero-preview').style.objectPosition = `${home.heroX}% ${home.heroY}%`
   $('#x-value').textContent = `${home.heroX}%`
   $('#y-value').textContent = `${home.heroY}%`
-  for (const [form, field, id] of [[gigForm, 'flyer', '#flyer-preview'], [venueForm, 'logo', '#logo-preview']]) {
+  for (const [form, field, id] of [[gigForm, 'flyer', '#flyer-preview'], [venueForm, 'logo', '#logo-preview'], [aboutForm, 'image', '#about-preview']]) {
     const value = form.elements[field].value
     $(id).hidden = !value
     if (value) $(id).src = value
@@ -139,6 +147,7 @@ function renderVenues() {
 }
 
 function refreshLists() {
+  options($('#about-entry'), state.data.about.map((entry) => [entry.id, entry.name]), null, aboutId)
   refreshVenueOptions()
   renderGigs()
   renderVenues()
@@ -222,6 +231,7 @@ async function load() {
     refreshImages()
     refreshLists()
     fill(homeForm, state.data.site.home)
+    editAbout(aboutId)
     resetGig()
     resetVenue()
     markDirty('Home', false)
@@ -229,6 +239,29 @@ async function load() {
     status('Loaded. Changes save on this computer.')
   })
 }
+
+function editAbout(id) {
+  const record = state.data.about.find((entry) => entry.id === id) || state.data.about[0]
+  aboutId = record.id
+  $('#about-entry').value = aboutId
+  fill(aboutForm, record)
+  markDirty('About', false)
+  previewImages()
+}
+
+$('#about-entry').addEventListener('change', () => {
+  if (discard('About')) editAbout($('#about-entry').value)
+  else $('#about-entry').value = aboutId
+})
+
+aboutForm.addEventListener('submit', (event) => {
+  event.preventDefault()
+  run('Saving biography…', async () => {
+    await mutate('about', 'save', fields(aboutForm), aboutId)
+    editAbout(aboutId)
+    status('Biography saved locally. Open Preview site to check it.')
+  })
+})
 
 homeForm.addEventListener('submit', (event) => {
   event.preventDefault()
@@ -260,12 +293,14 @@ venueForm.addEventListener('submit', (event) => {
   })
 })
 
-for (const [form, name] of [[homeForm, 'Home'], [gigForm, 'Gigs'], [venueForm, 'Venues']]) {
+for (const [form, name] of [[homeForm, 'Home'], [gigForm, 'Gigs'], [venueForm, 'Venues'], [aboutForm, 'About']]) {
   form.addEventListener('input', (event) => {
+    if (event.target.id === 'about-entry') return
     if (event.target.type !== 'file') markDirty(name)
     previewImages()
   })
   form.addEventListener('change', (event) => {
+    if (event.target.id === 'about-entry') return
     if (event.target.type !== 'file') markDirty(name)
     previewImages()
   })
@@ -291,7 +326,7 @@ for (const input of document.querySelectorAll('[data-upload]')) {
       state.images = result.images
       refreshImages()
       input.form.elements[input.dataset.target].value = result.path
-      markDirty(input.dataset.upload === 'home' ? 'Home' : input.dataset.upload === 'gigs' ? 'Gigs' : 'Venues')
+      markDirty({ home: 'Home', gigs: 'Gigs', venues: 'Venues', about: 'About' }[input.dataset.upload])
       previewImages()
       input.value = ''
       status('Image uploaded and selected. Save the form to use it on the site.')

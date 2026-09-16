@@ -503,45 +503,21 @@
             >
               <h2 class="prototype-label section-heading">About</h2>
 
-              <div class="section-inner about-layout">
-
-                <div class="about-copy">
-
-
-
-                  <p>
-                    Placeholder band description. This block exists
-                    so we can test how the frame responds to actual
-                    text rather than designing around an empty box.
-                  </p>
-
-                  <p>
-                    Add or remove paragraphs here later. The orange
-                    framing above should simply move as this section
-                    changes size.
-                  </p>
+              <div class="section-inner about-layout" data-about>
+                <div class="about-copy" aria-live="polite" aria-atomic="true">
+                  <h3 data-about-name>Quaternity</h3>
+                  <p class="about-role" data-about-role>The band</p>
+                  <div data-about-bio><p>Band biography coming soon.</p></div>
                 </div>
 
-                <div class="member-grid">
-
-                  <div class="member-placeholder">
-                    MEMBER 1
+                <div class="about-gallery" aria-label="Band and member photos">
+                  <div class="about-photo-frame">
+                    <div class="about-photo" data-about-photo></div>
+                    <button class="about-arrow about-previous" type="button" aria-label="Previous biography">&#8249;</button>
+                    <button class="about-arrow about-next" type="button" aria-label="Next biography">&#8250;</button>
                   </div>
-
-                  <div class="member-placeholder">
-                    MEMBER 2
-                  </div>
-
-                  <div class="member-placeholder">
-                    MEMBER 3
-                  </div>
-
-                  <div class="member-placeholder">
-                    MEMBER 4
-                  </div>
-
+                  <div class="about-tray" data-about-tray aria-label="Choose a biography"></div>
                 </div>
-
               </div>
             </section>
 

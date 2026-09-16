@@ -19,6 +19,7 @@
       <button type="button" data-tab="home" aria-current="page">Home</button>
       <button type="button" data-tab="gigs">Gigs</button>
       <button type="button" data-tab="venues">Venues</button>
+      <button type="button" data-tab="about">About</button>
     </nav>
     <main id="editor" inert>
       <section id="home-panel">
@@ -90,6 +91,29 @@
             <div class="actions"><button class="primary" type="submit" id="save-venue">Add venue</button><button type="button" id="new-venue">Clear / new venue</button></div>
           </form>
           <div class="panel"><label>Find a venue<input id="venue-search" type="search" placeholder="Name or address" /></label><div id="venue-list" class="saved-list"></div></div>
+        </div>
+      </section>
+      <section id="about-panel" hidden>
+        <div class="section-heading"><h2>About</h2><p>The band opens first, followed by the four members. Each photo stays paired with its biography.</p></div>
+        <div class="two-column">
+          <form id="about-form" class="panel fields">
+            <label>Edit biography<select id="about-entry"></select></label>
+            <label>Name / heading<input name="name" maxlength="100" required /></label>
+            <label>Role / subtitle<input name="role" maxlength="150" /></label>
+            <label>Photo<select name="image" data-image-picker="about"></select></label>
+            <label class="upload">Upload a photo<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" data-upload="about" data-target="image" /></label>
+            <p class="hint">PNG, JPG, WebP or GIF · up to 15 MB. Select None to show a placeholder. Photos fit inside the frame without cropping.</p>
+            <label>Photo description<input name="alt" maxlength="500" /></label>
+            <label>Biography<textarea name="bio" rows="12" maxlength="12000" placeholder="Write the biography here. Use a blank line between paragraphs."></textarea></label>
+            <button class="primary" type="submit">Save biography</button>
+          </form>
+          <aside class="panel">
+            <img id="about-preview" class="small-preview" alt="Selected About photo" hidden />
+            <h3 id="about-preview-name"></h3>
+            <p id="about-preview-role"></p>
+            <p id="about-preview-bio" style="white-space: pre-wrap; overflow-wrap: anywhere;"></p>
+            <p class="hint">Save each biography before selecting another. Preview site shows the full gallery.</p>
+          </aside>
         </div>
       </section>
     </main>

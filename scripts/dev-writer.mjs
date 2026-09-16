@@ -12,7 +12,7 @@ const BACKUPS = path.join(ROOT, 'node_modules', '.cache', 'quaternity-writer', '
 const PORT = Number(process.env.WRITER_PORT || 8787)
 const PREFIX = '/__writer'
 const LIMIT = 15 * 1024 * 1024
-const files = { site: 'site.json', events: 'events.json', venues: 'venues.json' }
+const files = { site: 'site.json', events: 'events.json', venues: 'venues.json', about: 'about.json' }
 const hash = (text) => createHash('sha256').update(text).digest('hex')
 const fail = (message, status = 400) => { throw Object.assign(new Error(message), { status }) }
 
@@ -147,6 +147,17 @@ async function validateVenue(record) {
   }
 }
 
+async function validateAbout(record) {
+  const image = await localImage(record.image, 'About photo')
+  return {
+    name: string(record.name, 'Name / heading', 100, true),
+    role: string(record.role ?? '', 'Role / subtitle', 150),
+    image,
+    alt: string(record.alt ?? '', 'Photo description', 500, Boolean(image)),
+    bio: string(record.bio ?? '', 'Biography', 12000),
+  }
+}
+
 async function validateSite(record) {
   const home = record.home
   if (!home || typeof home !== 'object') fail('Home settings are missing.')
@@ -186,6 +197,7 @@ async function mutate(key, action, payload) {
     const list = current.data[key]
     const id = string(payload.id ?? '', 'ID', 200)
     const index = list.findIndex((record) => record.id === id)
+    if (key === 'about' && (action !== 'save' || index === -1)) fail('Choose one of the five existing About entries.')
     if (action === 'delete') {
       if (index === -1) fail('Record no longer exists.', 404)
       if (key === 'venues' && current.data.events.some((event) => event.venueId === id)) fail('This venue is used by a gig. Change or remove that gig before deleting its venue.', 409)
@@ -193,7 +205,8 @@ async function mutate(key, action, payload) {
     } else if (action === 'save') {
       if (id && index === -1) fail('Record no longer exists. Reload from disk.', 409)
       if (!payload.record || typeof payload.record !== 'object') fail('Missing record.')
-      const clean = key === 'venues' ? await validateVenue(payload.record) : await validateEvent(payload.record, current.data.venues)
+      const clean = key === 'about' ? await validateAbout(payload.record)
+        : key === 'venues' ? await validateVenue(payload.record) : await validateEvent(payload.record, current.data.venues)
       const record = { ...(index >= 0 ? list[index] : {}), ...clean, id: id || `${key === 'venues' ? 'venue' : 'evt'}_${randomUUID()}` }
       next = index >= 0 ? list.map((item, i) => i === index ? record : item) : [...list, record]
       if (key === 'events') next.sort((a, b) => `${a.date}T${a.startTime}`.localeCompare(`${b.date}T${b.startTime}`))
@@ -205,7 +218,7 @@ async function mutate(key, action, payload) {
 
 async function upload(req, parsed) {
   const kind = parsed.searchParams.get('kind')
-  if (!['home', 'gigs', 'venues'].includes(kind)) fail('Invalid upload destination.')
+  if (!['home', 'gigs', 'venues', 'about'].includes(kind)) fail('Invalid upload destination.')
   const filename = path.basename(parsed.searchParams.get('name') || '')
   const extension = path.extname(filename).toLowerCase()
   if (!['.png', '.jpg', '.jpeg', '.webp', '.gif'].includes(extension)) fail('Choose a PNG, JPG, WebP or GIF image.')
@@ -239,7 +252,7 @@ async function middleware(req, res, next) {
     if (req.method === 'POST' && parsed.pathname === `${PREFIX}/api/upload`) {
       return json(res, 200, await upload(req, parsed))
     }
-    const mutation = parsed.pathname.match(/^\/__writer\/api\/(site|events|venues)\/(save|delete)$/)
+    const mutation = parsed.pathname.match(/^\/__writer\/api\/(site|events|venues|about)\/(save|delete)$/)
     if (req.method === 'POST' && mutation) {
       const body = await bodyJson(req)
       if (!body || typeof body !== 'object') fail('Missing request body.')
