@@ -20,6 +20,7 @@
       <button type="button" data-tab="gigs">Gigs</button>
       <button type="button" data-tab="venues">Venues</button>
       <button type="button" data-tab="about">About</button>
+      <button type="button" data-tab="listen">Listen</button>
     </nav>
     <main id="editor" inert>
       <section id="home-panel">
@@ -114,6 +115,19 @@
             <p id="about-preview-bio" style="white-space: pre-wrap; overflow-wrap: anywhere;"></p>
             <p class="hint">Save each biography before selecting another. Preview site shows the full gallery.</p>
           </aside>
+        </div>
+      </section>
+      <section id="listen-panel" hidden>
+        <div class="section-heading"><h2>Listen</h2><p>The first video opens on the main stage. Use Move up / Move down to set the order.</p></div>
+        <div class="two-column">
+          <form id="listen-form" class="panel fields">
+            <h3 id="listen-form-title">Add video</h3>
+            <label>Video title<input name="title" maxlength="200" required /></label>
+            <label>YouTube link<input name="url" type="url" maxlength="2000" placeholder="https://www.youtube.com/watch?v=…" required /></label>
+            <p class="hint">Use a video link, including Shorts or youtu.be links. A timestamp in the link is kept. The video must allow embedding.</p>
+            <div class="actions"><button class="primary" type="submit" id="save-listen">Add video</button><button type="button" id="new-listen">Clear / new video</button></div>
+          </form>
+          <div class="panel"><h3>Video order</h3><div id="listen-list" class="saved-list"></div></div>
         </div>
       </section>
     </main>

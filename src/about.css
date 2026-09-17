@@ -11,6 +11,7 @@
 #about [data-about-bio] p { margin: 0 0 1em; white-space: pre-wrap; }
 #about .about-photo-frame {
   position: relative;
+  width: 100%;
   aspect-ratio: 16 / 10;
   max-height: clamp(180px, calc(var(--section-content-height, 500px) - 112px), 540px);
   background: rgb(255 255 255 / 18%);

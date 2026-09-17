@@ -1,0 +1,60 @@
+/* Scoped to Listen; retain the existing section frame and navigation. */
+#listen > .listen-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: clamp(16px, 3vw, 40px);
+  align-items: start;
+}
+#listen .listen-stage { min-width: 0; }
+#listen .listen-player {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: max(120px, calc(var(--section-content-height, 600px) - 80px));
+  border: 2px solid var(--ink);
+  background: rgb(0 0 0 / 90%);
+  color: white;
+}
+#listen .listen-player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+#listen .listen-caption { margin: 10px 0 4px; font-weight: 700; overflow-wrap: anywhere; }
+#listen .listen-youtube { font-size: .85rem; color: inherit; text-decoration: underline; }
+#listen .listen-list {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  max-height: var(--section-content-height, 600px);
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 3px;
+}
+#listen .listen-choice {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 72px;
+  padding: 8px;
+  border: 2px solid transparent;
+  background: rgb(255 255 255 / 28%);
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+#listen .listen-choice img { width: 35%; max-width: 140px; aspect-ratio: 16 / 9; object-fit: cover; }
+#listen .listen-choice span { min-width: 0; overflow-wrap: anywhere; }
+#listen .listen-choice[aria-pressed="true"] { border-color: var(--ink); background: rgb(255 255 255 / 60%); }
+#listen .listen-choice:hover { background: rgb(255 255 255 / 50%); }
+#listen :focus-visible { outline: 3px solid var(--ink); outline-offset: 1px; }
+@media (max-width: 720px) {
+  #listen > .listen-layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(130px, 1fr); gap: 14px; }
+  #listen .listen-list { max-height: max(160px, calc(var(--section-content-height, 600px) * .45)); }
+}

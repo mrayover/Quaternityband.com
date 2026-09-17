@@ -844,7 +844,8 @@ function setupSectionScrolling({
   const contentBoxAt = (target) => {
     const box = target instanceof Element
       ? target.closest('.section-inner') : null
-    return boxes.includes(box) ? box : null
+    if (!boxes.includes(box)) return null
+    return target.closest('[data-section-scroll]') || box
   }
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 

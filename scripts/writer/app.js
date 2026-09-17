@@ -4,6 +4,8 @@ const $ = (selector) => document.querySelector(selector)
 const homeForm = $('#home-form'), gigForm = $('#gig-form'), venueForm = $('#venue-form')
 const aboutForm = $('#about-form')
 let aboutId = 'band'
+const listenForm = $('#listen-form')
+let listenId = ''
 const dirty = new Set()
 let state, gigId = '', venueId = '', busy = false
 
@@ -151,6 +153,7 @@ function refreshLists() {
   refreshVenueOptions()
   renderGigs()
   renderVenues()
+  renderListen()
   updateNext()
 }
 
@@ -234,11 +237,66 @@ async function load() {
     editAbout(aboutId)
     resetGig()
     resetVenue()
+    resetListen()
     markDirty('Home', false)
     previewImages()
     status('Loaded. Changes save on this computer.')
   })
 }
+
+function resetListen() {
+  listenId = ''
+  listenForm.reset()
+  $('#listen-form-title').textContent = 'Add video'
+  $('#save-listen').textContent = 'Add video'
+  markDirty('Listen', false)
+}
+
+function renderListen() {
+  const videos = state.data.listen
+  $('#listen-list').replaceChildren(...videos.map((video, index) => {
+    const card = recordCard(`${index + 1}. ${video.title}`, video.url, () => {
+      if (!discard('Listen')) return
+      listenId = video.id
+      fill(listenForm, video)
+      $('#listen-form-title').textContent = 'Edit video'
+      $('#save-listen').textContent = 'Save video'
+      markDirty('Listen', false)
+      listenForm.elements.title.focus()
+    }, () => {
+      if (video.id === listenId && !discard('Listen')) return
+      if (!window.confirm(`Delete “${video.title}”?`)) return
+      run('Deleting video…', async () => {
+        await mutate('listen', 'delete', null, video.id)
+        if (video.id === listenId) resetListen()
+        status('Video deleted locally.')
+      })
+    })
+    for (const [label, direction] of [['Move up', -1], ['Move down', 1]]) {
+      const button = actionButton(label, () => run('Saving video order…', async () => {
+        await mutate('listen', 'move', { direction }, video.id)
+        const replacement = $('#listen-list').children[index + direction]
+        replacement?.querySelector(`[data-direction="${direction}"]:not(:disabled)`)?.focus({ preventScroll: true })
+        status('Video order saved locally. The first video is the default.')
+      }))
+      button.dataset.direction = direction
+      button.disabled = index + direction < 0 || index + direction >= videos.length
+      card.querySelector('.actions').append(button)
+    }
+    return card
+  }))
+  if (!videos.length) $('#listen-list').append(node('p', 'No videos yet. Add a title and YouTube link.', 'hint'))
+}
+
+listenForm.addEventListener('submit', (event) => {
+  event.preventDefault()
+  run('Saving video…', async () => {
+    await mutate('listen', 'save', fields(listenForm), listenId)
+    resetListen()
+    status('Video saved locally. Open Preview site to check it.')
+  })
+})
+$('#new-listen').addEventListener('click', () => { if (discard('Listen')) resetListen() })
 
 function editAbout(id) {
   const record = state.data.about.find((entry) => entry.id === id) || state.data.about[0]
@@ -293,7 +351,7 @@ venueForm.addEventListener('submit', (event) => {
   })
 })
 
-for (const [form, name] of [[homeForm, 'Home'], [gigForm, 'Gigs'], [venueForm, 'Venues'], [aboutForm, 'About']]) {
+for (const [form, name] of [[homeForm, 'Home'], [gigForm, 'Gigs'], [venueForm, 'Venues'], [aboutForm, 'About'], [listenForm, 'Listen']]) {
   form.addEventListener('input', (event) => {
     if (event.target.id === 'about-entry') return
     if (event.target.type !== 'file') markDirty(name)

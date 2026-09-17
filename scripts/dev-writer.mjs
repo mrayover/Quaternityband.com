@@ -3,6 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { randomUUID, createHash } from 'node:crypto'
 import { createServer } from 'vite'
+import { parseYouTube } from '../src/youtube.js'
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url))
 const PUBLIC = path.join(ROOT, 'public')
@@ -12,7 +13,7 @@ const BACKUPS = path.join(ROOT, 'node_modules', '.cache', 'quaternity-writer', '
 const PORT = Number(process.env.WRITER_PORT || 8787)
 const PREFIX = '/__writer'
 const LIMIT = 15 * 1024 * 1024
-const files = { site: 'site.json', events: 'events.json', venues: 'venues.json', about: 'about.json' }
+const files = { site: 'site.json', events: 'events.json', venues: 'venues.json', about: 'about.json', listen: 'listen.json' }
 const hash = (text) => createHash('sha256').update(text).digest('hex')
 const fail = (message, status = 400) => { throw Object.assign(new Error(message), { status }) }
 
@@ -147,6 +148,15 @@ async function validateVenue(record) {
   }
 }
 
+function validateListen(record) {
+  const link = string(record.url, 'YouTube link', 2000, true)
+  if (!parseYouTube(link)) fail('Enter a YouTube video link (watch, youtu.be, Shorts, live or embed).')
+  return {
+    title: string(record.title, 'Video title', 200, true),
+    url: link,
+  }
+}
+
 async function validateAbout(record) {
   const image = await localImage(record.image, 'About photo')
   return {
@@ -198,16 +208,25 @@ async function mutate(key, action, payload) {
     const id = string(payload.id ?? '', 'ID', 200)
     const index = list.findIndex((record) => record.id === id)
     if (key === 'about' && (action !== 'save' || index === -1)) fail('Choose one of the five existing About entries.')
-    if (action === 'delete') {
+    if (action === 'move' && key === 'listen') {
+      if (index === -1) fail('Record no longer exists.', 404)
+      const direction = payload.record?.direction
+      if (![1, -1].includes(direction)) fail('Choose up or down.')
+      const destination = index + direction
+      if (destination < 0 || destination >= list.length) fail('This video is already at the end of the list.')
+      next = [...list]
+      ;[next[index], next[destination]] = [next[destination], next[index]]
+    } else if (action === 'delete') {
       if (index === -1) fail('Record no longer exists.', 404)
       if (key === 'venues' && current.data.events.some((event) => event.venueId === id)) fail('This venue is used by a gig. Change or remove that gig before deleting its venue.', 409)
       next = list.filter((record) => record.id !== id)
     } else if (action === 'save') {
       if (id && index === -1) fail('Record no longer exists. Reload from disk.', 409)
       if (!payload.record || typeof payload.record !== 'object') fail('Missing record.')
-      const clean = key === 'about' ? await validateAbout(payload.record)
+      const clean = key === 'listen' ? validateListen(payload.record)
+        : key === 'about' ? await validateAbout(payload.record)
         : key === 'venues' ? await validateVenue(payload.record) : await validateEvent(payload.record, current.data.venues)
-      const record = { ...(index >= 0 ? list[index] : {}), ...clean, id: id || `${key === 'venues' ? 'venue' : 'evt'}_${randomUUID()}` }
+      const record = { ...(index >= 0 ? list[index] : {}), ...clean, id: id || `${key === 'venues' ? 'venue' : key === 'listen' ? 'video' : 'evt'}_${randomUUID()}` }
       next = index >= 0 ? list.map((item, i) => i === index ? record : item) : [...list, record]
       if (key === 'events') next.sort((a, b) => `${a.date}T${a.startTime}`.localeCompare(`${b.date}T${b.startTime}`))
     } else fail('Unknown action.', 404)
@@ -252,7 +271,7 @@ async function middleware(req, res, next) {
     if (req.method === 'POST' && parsed.pathname === `${PREFIX}/api/upload`) {
       return json(res, 200, await upload(req, parsed))
     }
-    const mutation = parsed.pathname.match(/^\/__writer\/api\/(site|events|venues|about)\/(save|delete)$/)
+    const mutation = parsed.pathname.match(/^\/__writer\/api\/(site|events|venues|about|listen)\/(save|delete|move)$/)
     if (req.method === 'POST' && mutation) {
       const body = await bodyJson(req)
       if (!body || typeof body !== 'object') fail('Missing request body.')

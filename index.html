@@ -535,36 +535,13 @@
           >
             <h2 class="prototype-label section-heading">Listen</h2>
 
-            <div class="section-inner">
-
-              <div class="featured-media">
-                FEATURED VIDEO / AUDIO
+            <div class="section-inner listen-layout" data-listen>
+              <div class="listen-stage">
+                <div class="listen-player" data-listen-player></div>
+                <p class="listen-caption" data-listen-caption aria-live="polite"></p>
+                <a class="listen-youtube" data-listen-youtube target="_blank" rel="noopener noreferrer" hidden>Watch on YouTube ↗</a>
               </div>
-
-              <div class="media-tray">
-
-                <button type="button">
-                  MEDIA 1
-                </button>
-
-                <button type="button">
-                  MEDIA 2
-                </button>
-
-                <button type="button">
-                  MEDIA 3
-                </button>
-
-                <button type="button">
-                  MEDIA 4
-                </button>
-
-                <button type="button">
-                  MEDIA 5
-                </button>
-
-              </div>
-
+              <div class="listen-list" data-listen-list data-section-scroll tabindex="0" role="region" aria-label="Choose a video"></div>
             </div>
           </section>
 

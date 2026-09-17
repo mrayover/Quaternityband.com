@@ -1,0 +1,455 @@
+diff --git a/index.html b/index.html
+index 287febd..f298bab 100644
+--- a/index.html
++++ b/index.html
+@@ -535,36 +535,13 @@
+           >
+             <h2 class="prototype-label section-heading">Listen</h2>
+ 
+-            <div class="section-inner">
+-
+-              <div class="featured-media">
+-                FEATURED VIDEO / AUDIO
+-              </div>
+-
+-              <div class="media-tray">
+-
+-                <button type="button">
+-                  MEDIA 1
+-                </button>
+-
+-                <button type="button">
+-                  MEDIA 2
+-                </button>
+-
+-                <button type="button">
+-                  MEDIA 3
+-                </button>
+-
+-                <button type="button">
+-                  MEDIA 4
+-                </button>
+-
+-                <button type="button">
+-                  MEDIA 5
+-                </button>
+-
++            <div class="section-inner listen-layout" data-listen>
++              <div class="listen-stage">
++                <div class="listen-player" data-listen-player></div>
++                <p class="listen-caption" data-listen-caption aria-live="polite"></p>
++                <a class="listen-youtube" data-listen-youtube target="_blank" rel="noopener noreferrer" hidden>Watch on YouTube ↗</a>
+               </div>
+-
++              <div class="listen-list" data-listen-list data-section-scroll tabindex="0" role="region" aria-label="Choose a video"></div>
+             </div>
+           </section>
+ 
+diff --git a/scripts/dev-writer.mjs b/scripts/dev-writer.mjs
+index 2e3f3d0..fb6b2cf 100644
+--- a/scripts/dev-writer.mjs
++++ b/scripts/dev-writer.mjs
+@@ -3,6 +3,7 @@ import path from 'node:path'
+ import { fileURLToPath } from 'node:url'
+ import { randomUUID, createHash } from 'node:crypto'
+ import { createServer } from 'vite'
++import { parseYouTube } from '../src/youtube.js'
+ 
+ const ROOT = fileURLToPath(new URL('../', import.meta.url))
+ const PUBLIC = path.join(ROOT, 'public')
+@@ -12,7 +13,7 @@ const BACKUPS = path.join(ROOT, 'node_modules', '.cache', 'quaternity-writer', '
+ const PORT = Number(process.env.WRITER_PORT || 8787)
+ const PREFIX = '/__writer'
+ const LIMIT = 15 * 1024 * 1024
+-const files = { site: 'site.json', events: 'events.json', venues: 'venues.json', about: 'about.json' }
++const files = { site: 'site.json', events: 'events.json', venues: 'venues.json', about: 'about.json', listen: 'listen.json' }
+ const hash = (text) => createHash('sha256').update(text).digest('hex')
+ const fail = (message, status = 400) => { throw Object.assign(new Error(message), { status }) }
+ 
+@@ -147,6 +148,15 @@ async function validateVenue(record) {
+   }
+ }
+ 
++function validateListen(record) {
++  const link = string(record.url, 'YouTube link', 2000, true)
++  if (!parseYouTube(link)) fail('Enter a YouTube video link (watch, youtu.be, Shorts, live or embed).')
++  return {
++    title: string(record.title, 'Video title', 200, true),
++    url: link,
++  }
++}
++
+ async function validateAbout(record) {
+   const image = await localImage(record.image, 'About photo')
+   return {
+@@ -198,16 +208,25 @@ async function mutate(key, action, payload) {
+     const id = string(payload.id ?? '', 'ID', 200)
+     const index = list.findIndex((record) => record.id === id)
+     if (key === 'about' && (action !== 'save' || index === -1)) fail('Choose one of the five existing About entries.')
+-    if (action === 'delete') {
++    if (action === 'move' && key === 'listen') {
++      if (index === -1) fail('Record no longer exists.', 404)
++      const direction = payload.record?.direction
++      if (![1, -1].includes(direction)) fail('Choose up or down.')
++      const destination = index + direction
++      if (destination < 0 || destination >= list.length) fail('This video is already at the end of the list.')
++      next = [...list]
++      ;[next[index], next[destination]] = [next[destination], next[index]]
++    } else if (action === 'delete') {
+       if (index === -1) fail('Record no longer exists.', 404)
+       if (key === 'venues' && current.data.events.some((event) => event.venueId === id)) fail('This venue is used by a gig. Change or remove that gig before deleting its venue.', 409)
+       next = list.filter((record) => record.id !== id)
+     } else if (action === 'save') {
+       if (id && index === -1) fail('Record no longer exists. Reload from disk.', 409)
+       if (!payload.record || typeof payload.record !== 'object') fail('Missing record.')
+-      const clean = key === 'about' ? await validateAbout(payload.record)
++      const clean = key === 'listen' ? validateListen(payload.record)
++        : key === 'about' ? await validateAbout(payload.record)
+         : key === 'venues' ? await validateVenue(payload.record) : await validateEvent(payload.record, current.data.venues)
+-      const record = { ...(index >= 0 ? list[index] : {}), ...clean, id: id || `${key === 'venues' ? 'venue' : 'evt'}_${randomUUID()}` }
++      const record = { ...(index >= 0 ? list[index] : {}), ...clean, id: id || `${key === 'venues' ? 'venue' : key === 'listen' ? 'video' : 'evt'}_${randomUUID()}` }
+       next = index >= 0 ? list.map((item, i) => i === index ? record : item) : [...list, record]
+       if (key === 'events') next.sort((a, b) => `${a.date}T${a.startTime}`.localeCompare(`${b.date}T${b.startTime}`))
+     } else fail('Unknown action.', 404)
+@@ -252,7 +271,7 @@ async function middleware(req, res, next) {
+     if (req.method === 'POST' && parsed.pathname === `${PREFIX}/api/upload`) {
+       return json(res, 200, await upload(req, parsed))
+     }
+-    const mutation = parsed.pathname.match(/^\/__writer\/api\/(site|events|venues|about)\/(save|delete)$/)
++    const mutation = parsed.pathname.match(/^\/__writer\/api\/(site|events|venues|about|listen)\/(save|delete|move)$/)
+     if (req.method === 'POST' && mutation) {
+       const body = await bodyJson(req)
+       if (!body || typeof body !== 'object') fail('Missing request body.')
+diff --git a/scripts/writer/app.js b/scripts/writer/app.js
+index aa755d6..1ad5c30 100644
+--- a/scripts/writer/app.js
++++ b/scripts/writer/app.js
+@@ -4,6 +4,8 @@ const $ = (selector) => document.querySelector(selector)
+ const homeForm = $('#home-form'), gigForm = $('#gig-form'), venueForm = $('#venue-form')
+ const aboutForm = $('#about-form')
+ let aboutId = 'band'
++const listenForm = $('#listen-form')
++let listenId = ''
+ const dirty = new Set()
+ let state, gigId = '', venueId = '', busy = false
+ 
+@@ -151,6 +153,7 @@ function refreshLists() {
+   refreshVenueOptions()
+   renderGigs()
+   renderVenues()
++  renderListen()
+   updateNext()
+ }
+ 
+@@ -234,12 +237,67 @@ async function load() {
+     editAbout(aboutId)
+     resetGig()
+     resetVenue()
++    resetListen()
+     markDirty('Home', false)
+     previewImages()
+     status('Loaded. Changes save on this computer.')
+   })
+ }
+ 
++function resetListen() {
++  listenId = ''
++  listenForm.reset()
++  $('#listen-form-title').textContent = 'Add video'
++  $('#save-listen').textContent = 'Add video'
++  markDirty('Listen', false)
++}
++
++function renderListen() {
++  const videos = state.data.listen
++  $('#listen-list').replaceChildren(...videos.map((video, index) => {
++    const card = recordCard(`${index + 1}. ${video.title}`, video.url, () => {
++      if (!discard('Listen')) return
++      listenId = video.id
++      fill(listenForm, video)
++      $('#listen-form-title').textContent = 'Edit video'
++      $('#save-listen').textContent = 'Save video'
++      markDirty('Listen', false)
++      listenForm.elements.title.focus()
++    }, () => {
++      if (video.id === listenId && !discard('Listen')) return
++      if (!window.confirm(`Delete “${video.title}”?`)) return
++      run('Deleting video…', async () => {
++        await mutate('listen', 'delete', null, video.id)
++        if (video.id === listenId) resetListen()
++        status('Video deleted locally.')
++      })
++    })
++    for (const [label, direction] of [['Move up', -1], ['Move down', 1]]) {
++      const button = actionButton(label, () => run('Saving video order…', async () => {
++        await mutate('listen', 'move', { direction }, video.id)
++        const replacement = $('#listen-list').children[index + direction]
++        replacement?.querySelector(`[data-direction="${direction}"]:not(:disabled)`)?.focus({ preventScroll: true })
++        status('Video order saved locally. The first video is the default.')
++      }))
++      button.dataset.direction = direction
++      button.disabled = index + direction < 0 || index + direction >= videos.length
++      card.querySelector('.actions').append(button)
++    }
++    return card
++  }))
++  if (!videos.length) $('#listen-list').append(node('p', 'No videos yet. Add a title and YouTube link.', 'hint'))
++}
++
++listenForm.addEventListener('submit', (event) => {
++  event.preventDefault()
++  run('Saving video…', async () => {
++    await mutate('listen', 'save', fields(listenForm), listenId)
++    resetListen()
++    status('Video saved locally. Open Preview site to check it.')
++  })
++})
++$('#new-listen').addEventListener('click', () => { if (discard('Listen')) resetListen() })
++
+ function editAbout(id) {
+   const record = state.data.about.find((entry) => entry.id === id) || state.data.about[0]
+   aboutId = record.id
+@@ -293,7 +351,7 @@ venueForm.addEventListener('submit', (event) => {
+   })
+ })
+ 
+-for (const [form, name] of [[homeForm, 'Home'], [gigForm, 'Gigs'], [venueForm, 'Venues'], [aboutForm, 'About']]) {
++for (const [form, name] of [[homeForm, 'Home'], [gigForm, 'Gigs'], [venueForm, 'Venues'], [aboutForm, 'About'], [listenForm, 'Listen']]) {
+   form.addEventListener('input', (event) => {
+     if (event.target.id === 'about-entry') return
+     if (event.target.type !== 'file') markDirty(name)
+diff --git a/scripts/writer/index.html b/scripts/writer/index.html
+index debbf49..1b2a83d 100644
+--- a/scripts/writer/index.html
++++ b/scripts/writer/index.html
+@@ -20,6 +20,7 @@
+       <button type="button" data-tab="gigs">Gigs</button>
+       <button type="button" data-tab="venues">Venues</button>
+       <button type="button" data-tab="about">About</button>
++      <button type="button" data-tab="listen">Listen</button>
+     </nav>
+     <main id="editor" inert>
+       <section id="home-panel">
+@@ -116,6 +117,19 @@
+           </aside>
+         </div>
+       </section>
++      <section id="listen-panel" hidden>
++        <div class="section-heading"><h2>Listen</h2><p>The first video opens on the main stage. Use Move up / Move down to set the order.</p></div>
++        <div class="two-column">
++          <form id="listen-form" class="panel fields">
++            <h3 id="listen-form-title">Add video</h3>
++            <label>Video title<input name="title" maxlength="200" required /></label>
++            <label>YouTube link<input name="url" type="url" maxlength="2000" placeholder="https://www.youtube.com/watch?v=…" required /></label>
++            <p class="hint">Use a video link, including Shorts or youtu.be links. A timestamp in the link is kept. The video must allow embedding.</p>
++            <div class="actions"><button class="primary" type="submit" id="save-listen">Add video</button><button type="button" id="new-listen">Clear / new video</button></div>
++          </form>
++          <div class="panel"><h3>Video order</h3><div id="listen-list" class="saved-list"></div></div>
++        </div>
++      </section>
+     </main>
+     <footer>Changes save on this computer. Review the site, then commit and push to publish.</footer>
+     <script type="module" src="/__writer/app.js"></script>
+diff --git a/src/about.css b/src/about.css
+index 8b2f31f..c6cccd5 100644
+--- a/src/about.css
++++ b/src/about.css
+@@ -11,6 +11,7 @@
+ #about [data-about-bio] p { margin: 0 0 1em; white-space: pre-wrap; }
+ #about .about-photo-frame {
+   position: relative;
++  width: 100%;
+   aspect-ratio: 16 / 10;
+   max-height: clamp(180px, calc(var(--section-content-height, 500px) - 112px), 540px);
+   background: rgb(255 255 255 / 18%);
+diff --git a/src/data/listen.json b/src/data/listen.json
+new file mode 100644
+index 0000000..fe51488
+--- /dev/null
++++ b/src/data/listen.json
+@@ -0,0 +1 @@
++[]
+diff --git a/src/listen.css b/src/listen.css
+new file mode 100644
+index 0000000..73f8dec
+--- /dev/null
++++ b/src/listen.css
+@@ -0,0 +1,60 @@
++/* Scoped to Listen; retain the existing section frame and navigation. */
++#listen > .listen-layout {
++  display: grid;
++  grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr);
++  grid-template-rows: minmax(0, 1fr);
++  gap: clamp(16px, 3vw, 40px);
++  align-items: start;
++}
++#listen .listen-stage { min-width: 0; }
++#listen .listen-player {
++  position: relative;
++  display: grid;
++  place-items: center;
++  width: 100%;
++  aspect-ratio: 16 / 9;
++  max-height: max(120px, calc(var(--section-content-height, 600px) - 80px));
++  border: 2px solid var(--ink);
++  background: rgb(0 0 0 / 90%);
++  color: white;
++}
++#listen .listen-player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
++#listen .listen-caption { margin: 10px 0 4px; font-weight: 700; overflow-wrap: anywhere; }
++#listen .listen-youtube { font-size: .85rem; color: inherit; text-decoration: underline; }
++#listen .listen-list {
++  min-width: 0;
++  min-height: 0;
++  height: 100%;
++  max-height: var(--section-content-height, 600px);
++  overflow-y: auto;
++  overscroll-behavior-y: contain;
++  display: flex;
++  flex-direction: column;
++  gap: 10px;
++  padding: 3px;
++}
++#listen .listen-choice {
++  display: flex;
++  flex: none;
++  align-items: center;
++  gap: 12px;
++  width: 100%;
++  min-height: 72px;
++  padding: 8px;
++  border: 2px solid transparent;
++  background: rgb(255 255 255 / 28%);
++  color: inherit;
++  font: inherit;
++  font-weight: 700;
++  text-align: left;
++  cursor: pointer;
++}
++#listen .listen-choice img { width: 35%; max-width: 140px; aspect-ratio: 16 / 9; object-fit: cover; }
++#listen .listen-choice span { min-width: 0; overflow-wrap: anywhere; }
++#listen .listen-choice[aria-pressed="true"] { border-color: var(--ink); background: rgb(255 255 255 / 60%); }
++#listen .listen-choice:hover { background: rgb(255 255 255 / 50%); }
++#listen :focus-visible { outline: 3px solid var(--ink); outline-offset: 1px; }
++@media (max-width: 720px) {
++  #listen > .listen-layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(130px, 1fr); gap: 14px; }
++  #listen .listen-list { max-height: max(160px, calc(var(--section-content-height, 600px) * .45)); }
++}
+diff --git a/src/listen.js b/src/listen.js
+new file mode 100644
+index 0000000..7066ce0
+--- /dev/null
++++ b/src/listen.js
+@@ -0,0 +1,48 @@
++import entries from './data/listen.json'
++import { parseYouTube, embedURL } from './youtube.js'
++import './listen.css'
++
++const root = document.querySelector('[data-listen]')
++if (root) {
++  const player = root.querySelector('[data-listen-player]')
++  const caption = root.querySelector('[data-listen-caption]')
++  const outbound = root.querySelector('[data-listen-youtube]')
++  const videos = entries.map((entry) => ({ ...entry, video: parseYouTube(entry.url) })).filter((entry) => entry.video)
++  const buttons = videos.map((entry, index) => {
++    const button = document.createElement('button')
++    button.type = 'button'
++    button.className = 'listen-choice'
++    const thumbnail = document.createElement('img')
++    thumbnail.src = `https://i.ytimg.com/vi/${entry.video.id}/mqdefault.jpg`
++    thumbnail.alt = ''
++    thumbnail.loading = 'lazy'
++    thumbnail.addEventListener('error', () => { thumbnail.hidden = true }, { once: true })
++    const title = document.createElement('span')
++    title.textContent = entry.title
++    button.append(thumbnail, title)
++    button.addEventListener('click', () => select(index, true))
++    return button
++  })
++  root.querySelector('[data-listen-list]').replaceChildren(...buttons)
++
++  function select(index, autoplay = false) {
++    const entry = videos[index]
++    const frame = document.createElement('iframe')
++    frame.src = embedURL(entry.video, autoplay)
++    frame.title = entry.title
++    frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen'
++    frame.allowFullscreen = true
++    frame.referrerPolicy = 'strict-origin-when-cross-origin'
++    player.replaceChildren(frame)
++    caption.textContent = entry.title
++    outbound.href = entry.url
++    outbound.hidden = false
++    buttons.forEach((button, i) => button.setAttribute('aria-pressed', String(i === index)))
++  }
++  if (videos.length) select(0)
++  else {
++    const empty = document.createElement('p')
++    empty.textContent = 'Videos coming soon.'
++    player.append(empty)
++  }
++}
+diff --git a/src/main.js b/src/main.js
+index 9664318..918bc2e 100644
+--- a/src/main.js
++++ b/src/main.js
+@@ -844,7 +844,8 @@ function setupSectionScrolling({
+   const contentBoxAt = (target) => {
+     const box = target instanceof Element
+       ? target.closest('.section-inner') : null
+-    return boxes.includes(box) ? box : null
++    if (!boxes.includes(box)) return null
++    return target.closest('[data-section-scroll]') || box
+   }
+   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+ 
+diff --git a/src/site-content.js b/src/site-content.js
+index 499f8bb..f49e734 100644
+--- a/src/site-content.js
++++ b/src/site-content.js
+@@ -4,6 +4,7 @@ import venues from './data/venues.json'
+ import { upcomingEvents, displayDate, displayTime } from './gig-data.js'
+ import './site-content.css'
+ import './about.js'
++import './listen.js'
+ 
+ const element = (tag, className, text) => {
+   const node = document.createElement(tag)
+diff --git a/src/youtube.js b/src/youtube.js
+new file mode 100644
+index 0000000..1213f76
+--- /dev/null
++++ b/src/youtube.js
+@@ -0,0 +1,32 @@
++// Used by both the static player and the local writer validator.
++export function parseYouTube(value) {
++  try {
++    const url = new URL(value)
++    if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password) return null
++    const host = url.hostname.toLowerCase()
++    const parts = url.pathname.split('/').filter(Boolean)
++    let id
++    if (['youtu.be', 'www.youtu.be'].includes(host)) id = parts.length === 1 ? parts[0] : null
++    else if (['youtube.com', 'www.youtube.com', 'm.youtube.com', 'music.youtube.com', 'youtube-nocookie.com', 'www.youtube-nocookie.com'].includes(host)) {
++      if (url.pathname === '/watch') id = url.searchParams.get('v')
++      else if (['embed', 'shorts', 'live'].includes(parts[0]) && parts.length === 2) id = parts[1]
++    }
++    if (!/^[A-Za-z0-9_-]{11}$/.test(id || '')) return null
++    const time = url.searchParams.get('start') || url.searchParams.get('t') || new URLSearchParams(url.hash.slice(1)).get('t') || ''
++    let start = 0
++    if (/^\d+$/.test(time)) start = Number(time)
++    else {
++      const match = time.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/)
++      if (match) start = Number(match[1] || 0) * 3600 + Number(match[2] || 0) * 60 + Number(match[3] || 0)
++    }
++    return { id, start: Number.isSafeInteger(start) ? start : 0 }
++  } catch { return null }
++}
++
++export function embedURL(video, autoplay = false) {
++  const url = new URL(`https://www.youtube-nocookie.com/embed/${video.id}`)
++  url.searchParams.set('playsinline', '1')
++  if (video.start) url.searchParams.set('start', String(video.start))
++  if (autoplay) url.searchParams.set('autoplay', '1')
++  return url.href
++}
