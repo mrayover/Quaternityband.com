@@ -1,4 +1,5 @@
 import './site-content.js'
+import './contact.css'
 
 /* ============================================================
    QUATERNITY — PERSISTENT PRIMARY NAVIGATION

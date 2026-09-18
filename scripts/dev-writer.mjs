@@ -13,7 +13,7 @@ const BACKUPS = path.join(ROOT, 'node_modules', '.cache', 'quaternity-writer', '
 const PORT = Number(process.env.WRITER_PORT || 8787)
 const PREFIX = '/__writer'
 const LIMIT = 15 * 1024 * 1024
-const files = { site: 'site.json', events: 'events.json', venues: 'venues.json', about: 'about.json', listen: 'listen.json' }
+const files = { site: 'site.json', events: 'events.json', venues: 'venues.json', about: 'about.json', listen: 'listen.json', contact: 'contact.json' }
 const hash = (text) => createHash('sha256').update(text).digest('hex')
 const fail = (message, status = 400) => { throw Object.assign(new Error(message), { status }) }
 
@@ -55,7 +55,7 @@ async function loadAll() {
   for (const [key, file] of Object.entries(files)) {
     const raw = await fs.readFile(path.join(DATA, file), 'utf8')
     try { data[key] = JSON.parse(raw) } catch { fail(`${file} contains invalid JSON. Nothing was overwritten.`, 500) }
-    if (key !== 'site' && !Array.isArray(data[key])) fail(`${file} must contain an array.`, 500)
+    if (!['site', 'contact'].includes(key) && !Array.isArray(data[key])) fail(`${file} must contain an array.`, 500)
     revisions[key] = hash(raw)
   }
   return { data, revisions }
@@ -195,12 +195,32 @@ function serial(operation) {
   return next
 }
 
+function validateContact(record) {
+  if (!record || typeof record !== 'object') fail('Missing Contact settings.')
+  if (!Array.isArray(record.links) || record.links.length > 2) fail('Use up to two additional links.')
+  const links = record.links.map((link) => {
+    if (!link || typeof link !== 'object') fail('Invalid additional link.')
+    const label = string(link.label, 'Link label', 100)
+    const href = url(link.url, 'Additional link')
+    if (Boolean(label) !== Boolean(href)) fail('Each additional link needs both a label and URL, or leave both blank.')
+    return { label, url: href }
+  }).filter((link) => link.url)
+  return {
+    title: string(record.title, 'Contact title', 200, true),
+    body: string(record.body, 'Contact text', 12000),
+    links,
+  }
+}
+
 async function mutate(key, action, payload) {
   if (!Object.hasOwn(files, key)) fail('Unknown data file.', 404)
   const current = await loadAll()
   if (payload.revision !== current.revisions[key]) fail('This file changed. Reload from disk before saving.', 409)
   let next
-  if (key === 'site') {
+  if (key === 'contact') {
+    if (action !== 'save') fail('Unknown action.', 404)
+    next = validateContact(payload.record)
+  } else if (key === 'site') {
     if (action !== 'save') fail('Unknown action.', 404)
     next = { ...current.data.site, ...await validateSite(payload.record) }
   } else {
@@ -271,7 +291,7 @@ async function middleware(req, res, next) {
     if (req.method === 'POST' && parsed.pathname === `${PREFIX}/api/upload`) {
       return json(res, 200, await upload(req, parsed))
     }
-    const mutation = parsed.pathname.match(/^\/__writer\/api\/(site|events|venues|about|listen)\/(save|delete|move)$/)
+    const mutation = parsed.pathname.match(/^\/__writer\/api\/(site|events|venues|about|listen|contact)\/(save|delete|move)$/)
     if (req.method === 'POST' && mutation) {
       const body = await bodyJson(req)
       if (!body || typeof body !== 'object') fail('Missing request body.')

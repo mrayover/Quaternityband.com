@@ -1,0 +1,104 @@
+#contact .contact-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(24px, 4vw, 56px);
+  align-items: start;
+  align-content: start;
+}
+
+#contact .contact-copy,
+#contact .contact-form {
+  min-width: 0;
+}
+
+#contact .contact-copy {
+  padding: 12px 4px;
+}
+
+#contact h3 {
+  margin: 0 0 20px;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+#contact .contact-copy p {
+  max-width: 46ch;
+  margin: 0 0 20px;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+#contact a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  overflow-wrap: anywhere;
+}
+
+#contact a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 5px;
+}
+
+#contact .contact-email {
+  display: inline-block;
+  font-weight: 700;
+}
+
+#contact .contact-socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-top: 24px;
+}
+
+#contact iframe {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+}
+
+#contact .contact-form-link {
+  margin: 12px 0 20px;
+  font-size: 0.875rem;
+}
+
+.section-scroll-ready #contact {
+  padding-top: 8px;
+}
+
+.section-scroll-ready #contact .contact-copy {
+  padding-top: 4px;
+}
+
+.section-scroll-ready #contact .contact-form {
+  min-width: 0;
+  overflow: visible;
+}
+
+.section-scroll-ready #contact iframe {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  zoom: 0.8;
+}
+
+/* Keep any necessary scrolling, with a less intrusive scrollbar. */
+.section-scroll-ready #contact > .contact-layout {
+  scrollbar-width: thin;
+  scrollbar-color: #9b925f #efe4a4;
+}
+
+@media (max-width: 720px) {
+  #contact .contact-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .section-scroll-ready #contact iframe {
+    width: 100%;
+    zoom: 1;
+  }
+}

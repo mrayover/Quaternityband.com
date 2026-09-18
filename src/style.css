@@ -1,4 +1,10 @@
 @import "tailwindcss";
+@import "./corners.css";
+@import "@fontsource/alegreya-sans/latin-400.css";
+@import "@fontsource/alegreya-sans/latin-400-italic.css";
+@import "@fontsource/alegreya-sans/latin-500.css";
+@import "@fontsource/alegreya-sans/latin-700.css";
+@import "@fontsource/alegreya-sans/latin-800.css";
 
 
 /* ============================================================
@@ -205,6 +211,7 @@ body {
   color: var(--ink);
 
   font-family:
+    "Alegreya Sans",
     Arial,
     Helvetica,
     sans-serif;

@@ -21,6 +21,7 @@
       <button type="button" data-tab="venues">Venues</button>
       <button type="button" data-tab="about">About</button>
       <button type="button" data-tab="listen">Listen</button>
+      <button type="button" data-tab="contact">Contact</button>
     </nav>
     <main id="editor" inert>
       <section id="home-panel">
@@ -129,6 +130,23 @@
           </form>
           <div class="panel"><h3>Video order</h3><div id="listen-list" class="saved-list"></div></div>
         </div>
+      </section>
+      <section id="contact-panel" hidden>
+        <div class="section-heading"><h2>Contact</h2><p>Edit the text beside the form. Additional links appear beneath Instagram and YouTube.</p></div>
+        <form id="contact-form" class="panel fields">
+          <label>Title<input name="title" maxlength="200" required /></label>
+          <label>Content<textarea name="body" rows="10" maxlength="12000"></textarea></label>
+          <p class="hint">Use a blank line between paragraphs. Leave both fields blank to omit an additional link.</p>
+          <div class="field-row">
+            <label>First link label<input name="link1Label" maxlength="100" /></label>
+            <label>First link URL<input name="link1Url" type="url" maxlength="2000" placeholder="https://…" /></label>
+          </div>
+          <div class="field-row">
+            <label>Second link label<input name="link2Label" maxlength="100" /></label>
+            <label>Second link URL<input name="link2Url" type="url" maxlength="2000" placeholder="https://…" /></label>
+          </div>
+          <button class="primary" type="submit">Save Contact</button>
+        </form>
       </section>
     </main>
     <footer>Changes save on this computer. Review the site, then commit and push to publish.</footer>

@@ -5,6 +5,7 @@ const homeForm = $('#home-form'), gigForm = $('#gig-form'), venueForm = $('#venu
 const aboutForm = $('#about-form')
 let aboutId = 'band'
 const listenForm = $('#listen-form')
+const contactForm = $('#contact-form')
 let listenId = ''
 const dirty = new Set()
 let state, gigId = '', venueId = '', busy = false
@@ -238,11 +239,39 @@ async function load() {
     resetGig()
     resetVenue()
     resetListen()
+    fillContact()
     markDirty('Home', false)
     previewImages()
     status('Loaded. Changes save on this computer.')
   })
 }
+
+function fillContact() {
+  const contact = state.data.contact
+  fill(contactForm, {
+    title: contact.title,
+    body: contact.body,
+    link1Label: contact.links[0]?.label,
+    link1Url: contact.links[0]?.url,
+    link2Label: contact.links[1]?.label,
+    link2Url: contact.links[1]?.url,
+  })
+  markDirty('Contact', false)
+}
+
+contactForm.addEventListener('submit', (event) => {
+  event.preventDefault()
+  run('Saving Contact…', async () => {
+    const values = fields(contactForm)
+    await mutate('contact', 'save', {
+      title: values.title,
+      body: values.body,
+      links: [1, 2].map((i) => ({ label: values[`link${i}Label`], url: values[`link${i}Url`] })),
+    })
+    fillContact()
+    status('Contact saved locally. Open Preview site to check it.')
+  })
+})
 
 function resetListen() {
   listenId = ''
@@ -351,7 +380,7 @@ venueForm.addEventListener('submit', (event) => {
   })
 })
 
-for (const [form, name] of [[homeForm, 'Home'], [gigForm, 'Gigs'], [venueForm, 'Venues'], [aboutForm, 'About'], [listenForm, 'Listen']]) {
+for (const [form, name] of [[homeForm, 'Home'], [gigForm, 'Gigs'], [venueForm, 'Venues'], [aboutForm, 'About'], [listenForm, 'Listen'], [contactForm, 'Contact']]) {
   form.addEventListener('input', (event) => {
     if (event.target.id === 'about-entry') return
     if (event.target.type !== 'file') markDirty(name)

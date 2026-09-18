@@ -1,0 +1,15 @@
+#contact .contact-body p {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+#contact h3 {
+  overflow-wrap: anywhere;
+}
+
+#contact .contact-extra-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-top: 24px;
+}

@@ -5,6 +5,7 @@ import { upcomingEvents, displayDate, displayTime } from './gig-data.js'
 import './site-content.css'
 import './about.js'
 import './listen.js'
+import './contact-content.js'
 
 const element = (tag, className, text) => {
   const node = document.createElement(tag)
