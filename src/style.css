@@ -1992,3 +1992,9 @@ button {
   }
 
 }
+/* Center the hero image and Next Gig together on mobile. */
+@media (max-width: 720px) {
+  .section-scroll-ready .landing-hero {
+    align-content: center;
+  }
+}
