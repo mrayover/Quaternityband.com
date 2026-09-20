@@ -1488,7 +1488,7 @@ button {
 
   align-items: center;
 
-  padding: 24px;
+  padding: 8px 24px;
 
   border:
     var(--line-width)
@@ -1986,7 +1986,7 @@ button {
       82px
       1fr;
 
-    padding: 14px;
+    padding: 8px 14px;
 
     gap: 14px;
   }

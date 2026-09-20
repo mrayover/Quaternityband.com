@@ -10,5 +10,65 @@
     "flyer": "/assets/Images/Writer/gigs/Eden_9-18-26-5bb4d662-0c2d-40d0-ab93-5d5754d1ee4f.jpg",
     "status": "scheduled",
     "id": "evt_bf07a0f2-a3c1-4c3e-bac1-06e68bf9da2a"
+  },
+  {
+    "title": "Quaternity @ Barrelhouse Visalia",
+    "date": "2026-10-06",
+    "startTime": "18:00",
+    "endTime": "20:30",
+    "venueId": "venue_6ab25a27-9784-48ce-aed6-2dbc363cba71",
+    "details": "All ages, our first show in Visalia!",
+    "link": "",
+    "flyer": "",
+    "status": "scheduled",
+    "id": "evt_855b9e5a-3c72-45be-ad4d-d7bc7d02b15c"
+  },
+  {
+    "title": "Quaternity @ Goldesteins",
+    "date": "2026-10-15",
+    "startTime": "21:00",
+    "endTime": "23:00",
+    "venueId": "goldsteins",
+    "details": "21+ Our first time at Golds!",
+    "link": "",
+    "flyer": "",
+    "status": "scheduled",
+    "id": "evt_52c95a53-3459-49e9-b06e-0af8ae454475"
+  },
+  {
+    "title": "Quaternity @ EDEN Wine Lounge",
+    "date": "2026-10-23",
+    "startTime": "20:00",
+    "endTime": "22:00",
+    "venueId": "venue_ef0a1fcf-ccba-4f61-baaa-a177a69ac238",
+    "details": "21+",
+    "link": "https://speakeasygo.com/event/EVE-REVURW",
+    "flyer": "",
+    "status": "scheduled",
+    "id": "evt_61cc4786-7531-4f62-b97b-83b7e880a3bd"
+  },
+  {
+    "title": "Quaternity @ Howlin Wolf",
+    "date": "2026-11-10",
+    "startTime": "19:00",
+    "endTime": "22:00",
+    "venueId": "venue_15695d30-59ab-40d7-8801-e30aae52f295",
+    "details": "21+",
+    "link": "",
+    "flyer": "",
+    "status": "scheduled",
+    "id": "evt_d39e6288-9522-406e-a2a8-ec2b8ea4feb3"
+  },
+  {
+    "title": "Quaternity @ Howlin Wolf Christmas Special!",
+    "date": "2026-12-22",
+    "startTime": "19:00",
+    "endTime": "22:00",
+    "venueId": "venue_15695d30-59ab-40d7-8801-e30aae52f295",
+    "details": "21+ Come hang and hear some jazz and Christmas tunes",
+    "link": "",
+    "flyer": "",
+    "status": "scheduled",
+    "id": "evt_da6aac0d-c0a3-42b5-8b6e-ac204ba5457a"
   }
 ]

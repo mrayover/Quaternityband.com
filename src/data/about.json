@@ -3,8 +3,8 @@
     "id": "band",
     "name": "Quaternity",
     "role": "The band",
-    "image": "/assets/Images/Writer/about/BespokeHero-142e9619-6293-4e10-a684-f345264d8c7e.png",
-    "alt": "Bespoke 2026",
+    "image": "/assets/Images/Writer/about/CoverPhoto-b6540735-dbb4-419d-a168-2214800384a7.jpg",
+    "alt": "Eden 2026",
     "bio": "We are a four-piece jazz group from Fresno, California, playing originals, standards, arrangements of popular tunes, and other fun stuff. We like to dabble in a bit of everything, with improvisation at the heart of what we do. We’re equally at home playing a straight-ahead jazz gig or getting experimental and a little out there.\n\nCheck out the Listen section for a taste of what we’re about. If you’re a venue or promoter, feel free to reach out through the Contact section. Thanks for dropping by!"
   },
   {
@@ -13,23 +13,23 @@
     "role": "Saxophone / EWI",
     "image": "",
     "alt": "",
-    "bio": "Member biography coming soon."
+    "bio": "Jordan De La Torre is an active saxophonist, performer, and educator based in Fresno, California. In addition to his core studies under Drs. Otto Lee and Dan Graser, he has also worked with internationally recognized saxophonists including Timothy McAllister, Douglas Masek, and Kenneth Tse.\nDe La Torre performs regularly as a soloist and chamber musician, spanning the traditional and contemporary repertoire. In 2024, he won the Fresno State Concerto Competition alongside his group, the Elysium Quartet. As a jazz musician, he has performed and recorded with the Latin JazzFresno Big Band, Andrew Alcocer’s Big Band, the MODE Quartet, and was a featured soloist for the Fresno State Jazz Orchestra’s Downbeat Magazine Outstanding Performance award.\nAs an educator, De La Torre maintains a private studio, coaches saxophone quartets, and teaches at local schools. His students have excelled in honor bands, national summer programs, and competitions including the Fischoff Chamber Music Competition."
   },
   {
     "id": "member-2",
     "name": "Marcus Overacker",
     "role": "Guitar",
-    "image": "",
-    "alt": "",
+    "image": "/assets/Images/Writer/about/Marcus_Headshot-990a9da8-fe25-490a-940c-43abb82420eb.jpg",
+    "alt": "Marcus Picture",
     "bio": "Member biography coming soon."
   },
   {
     "id": "member-3",
     "name": "Xavier Bueno",
     "role": "Bass",
-    "image": "",
-    "alt": "",
-    "bio": "Member biography coming soon."
+    "image": "/assets/Images/Writer/about/XBueno-5ffabfe2-a202-4ab5-b5c9-7851b33f4fbc.jpg",
+    "alt": "Xavier Photo",
+    "bio": "Xavier Nathaniel Bueno is a composer, educator, and multi-instrumentalist based in Fresno, California. Bueno has composed and performed across genres, including classical, electronic, rock, and jazz. Bueno has a Master’s Degree in Music Theory and Composition from California State University, Fresno. During his studies, he was selected as a finalist to speak at the 46th annual Central California Research Symposium about the ethics of using AI in the music industry. He has received several awards, including an Audience Award for Fresno State’s 5th Annual Art Song Festival and a finalist spot in Sing Out Strong!: Emancipated Voices, where he composed for the Boston Youth String Orchestra. His most recent composition is called “The Spirit of Calico Peak,” which was premiered by Baird Middle School in Fresno, California, in May of 2026. Today, Bueno is performing with three groups: Lunch Money, Honey Lake, and Quaternity. You can find Bueno composing for independent projects, working as an administrator for Patrick’s Music, and teaching group Music Classes for Selma Unified School District."
   },
   {
     "id": "member-4",

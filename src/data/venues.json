@@ -299,5 +299,27 @@
     "socialUrl": "https://www.instagram.com/edenfresno?igsh=MXI5eXNvZ3J1MWc2dw%3D%3D&utm_source=qr",
     "logo": "",
     "id": "venue_ef0a1fcf-ccba-4f61-baaa-a177a69ac238"
+  },
+  {
+    "name": "Barrelhouse Brewing Visalia",
+    "city": "Visalia",
+    "address": "521 E Main St, Visalia, CA 93292",
+    "mapLink": "https://maps.app.goo.gl/8svLHencV3v36m6H6",
+    "website": "https://barrelhousebrewing.com/locations-visalia",
+    "socialType": "ig",
+    "socialUrl": "https://www.instagram.com/bhbcvisalia/",
+    "logo": "",
+    "id": "venue_6ab25a27-9784-48ce-aed6-2dbc363cba71"
+  },
+  {
+    "name": "Howlin Wolf",
+    "city": "Fresno",
+    "address": "920 E Olive Ave, Fresno, CA 93728",
+    "mapLink": "https://maps.app.goo.gl/pyvtUdPecjrV2Xeo6",
+    "website": "",
+    "socialType": "ig",
+    "socialUrl": "https://www.instagram.com/the.howlin.wolf.fresno/?hl=en",
+    "logo": "",
+    "id": "venue_15695d30-59ab-40d7-8801-e30aae52f295"
   }
 ]
