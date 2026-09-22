@@ -65,11 +65,11 @@
 }
 
 .section-scroll-ready #contact {
-  padding-top: 8px;
+  padding-top: calc(var(--ray-gap) + 1px);
 }
 
 .section-scroll-ready #contact .contact-copy {
-  padding-top: 4px;
+  padding-top: 0;
 }
 
 .section-scroll-ready #contact .contact-form {

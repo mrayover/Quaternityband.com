@@ -1113,7 +1113,19 @@ function setupSectionScrolling({
       : sections.findIndex((section) => `#${section.id}` === hash) + 1
     if (hash !== '#top' && index === 0) return
     event.preventDefault()
-    if (location.hash !== hash) history.pushState(null, '', hash)
+
+    if (hash === '#top') {
+      if (location.hash) {
+        history.pushState(
+          null,
+          '',
+          location.pathname + location.search
+        )
+      }
+    } else if (location.hash !== hash) {
+      history.pushState(null, '', hash)
+    }
+
     wheelGesture = null
     go(index, true)
   })
@@ -1149,4 +1161,12 @@ function setupSectionScrolling({
 
   measure(false)
   go(location.hash ? hashIndex() : closestStop(), false, true)
+
+  if (location.hash === '#top') {
+    history.replaceState(
+      null,
+      '',
+      location.pathname + location.search
+    )
+  }
 }

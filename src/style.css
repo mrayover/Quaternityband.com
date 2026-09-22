@@ -1674,12 +1674,9 @@ button {
   height: var(--section-screen-height);
   min-height: 0;
   padding:
-    calc(
-      var(--ray-gap) + 1px
-      + var(--section-edge-space)
-    )
+    calc(var(--ray-gap) + 1px)
     var(--section-edge-space)
-    var(--section-edge-space);
+    var(--ray-gap);
   overflow: hidden;
   scroll-margin-top: var(--section-stop-top);
 }
