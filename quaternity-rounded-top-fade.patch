@@ -1,0 +1,57 @@
+--- a/src/style.css
++++ b/src/style.css
+@@ -345,6 +345,54 @@
+   background-repeat: no-repeat;
+ }
+ 
++/* A single exterior cutout rounds BOTH the scrolling shell and the fixed
++   header. It never clips either element or changes their containing blocks.
++   The opaque underlay prevents the two patterns from blending out of phase. */
++@supports (mask-image: linear-gradient(black, transparent)) {
++  .site-frame::before {
++    background: var(--ink);
++  }
++
++  .site-frame::after {
++    --outer-edge-fade: 32px;
++    --outer-corner: calc(6px + 4 * var(--frame-step) + var(--outer-border-width));
++    --outer-gutter: max(0px, calc((100% - 1240px) / 2));
++
++    content: "";
++    position: fixed;
++    inset: 0;
++    z-index: 26;
++    pointer-events: none;
++
++    background-color: var(--ink);
++    background-image: var(--outer-pattern-image);
++    background-size: var(--outer-pattern-size);
++    background-repeat: repeat;
++    animation: outer-pattern-drift var(--outer-pattern-speed) linear infinite;
++
++    /* These three regions meet, but do not overlap: two rounded top
++       corners and the straight sides below. The center is fully unmasked. */
++    mask-image:
++      radial-gradient(circle at right bottom,
++        transparent var(--outer-corner),
++        black calc(var(--outer-corner) + var(--outer-edge-fade))),
++      radial-gradient(circle at left bottom,
++        transparent var(--outer-corner),
++        black calc(var(--outer-corner) + var(--outer-edge-fade))),
++      linear-gradient(to right,
++        black calc(var(--outer-gutter) - var(--outer-edge-fade)),
++        transparent var(--outer-gutter),
++        transparent calc(100% - var(--outer-gutter)),
++        black calc(100% - var(--outer-gutter) + var(--outer-edge-fade)));
++    mask-size:
++      calc(var(--outer-gutter) + var(--outer-corner)) var(--outer-corner),
++      calc(var(--outer-gutter) + var(--outer-corner)) var(--outer-corner),
++      100% calc(100% - var(--outer-corner));
++    mask-position: left top, right top, center bottom;
++    mask-repeat: no-repeat;
++  }
++}
++
+ 
+ /* ============================================================
+    Q / EMBLEM PLACEHOLDER

@@ -316,6 +316,83 @@ button {
   isolation: isolate;
 }
 
+/* One viewport-fixed feather outside the shell. Keep the original opaque
+   border and header backing: fading either of those independently would
+   expose scrolling content or double the opacity at their overlap.
+   This pseudo-element paints only the exterior side gutters, never content.
+   The existing isolated stacking context keeps it above the circle pattern
+   but behind all page and fixed-header elements. */
+.site-frame::before {
+  --outer-edge-fade: 32px;
+
+  content: "";
+  position: fixed;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: calc(min(1240px, 100%) + 2 * var(--outer-edge-fade));
+  transform: translateX(-50%);
+  pointer-events: none;
+
+  /* A 1px opaque overlap avoids a fractional-pixel crack at the border.
+     The middle of this layer stays transparent; nothing is blurred. */
+  background-image:
+    linear-gradient(to right, transparent, var(--ink) var(--outer-edge-fade)),
+    linear-gradient(to left, transparent, var(--ink) var(--outer-edge-fade));
+  background-size: calc(var(--outer-edge-fade) + 1px) 100%;
+  background-position: left top, right top;
+  background-repeat: no-repeat;
+}
+
+/* A single exterior cutout rounds BOTH the scrolling shell and the fixed
+   header. It never clips either element or changes their containing blocks.
+   The opaque underlay prevents the two patterns from blending out of phase. */
+@supports (mask-image: linear-gradient(black, transparent)) {
+  .site-frame::before {
+    background: var(--ink);
+  }
+
+  .site-frame::after {
+    --outer-edge-fade: 32px;
+    --outer-corner: calc(6px + 4 * var(--frame-step) + var(--outer-border-width));
+    --outer-gutter: max(0px, calc((100% - 1240px) / 2));
+
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 26;
+    pointer-events: none;
+
+    background-color: var(--ink);
+    background-image: var(--outer-pattern-image);
+    background-size: var(--outer-pattern-size);
+    background-repeat: repeat;
+    animation: outer-pattern-drift var(--outer-pattern-speed) linear infinite;
+
+    /* These three regions meet, but do not overlap: two rounded top
+       corners and the straight sides below. The center is fully unmasked. */
+    mask-image:
+      radial-gradient(circle at right bottom,
+        transparent var(--outer-corner),
+        black calc(var(--outer-corner) + var(--outer-edge-fade))),
+      radial-gradient(circle at left bottom,
+        transparent var(--outer-corner),
+        black calc(var(--outer-corner) + var(--outer-edge-fade))),
+      linear-gradient(to right,
+        black calc(var(--outer-gutter) - var(--outer-edge-fade)),
+        transparent var(--outer-gutter),
+        transparent calc(100% - var(--outer-gutter)),
+        black calc(100% - var(--outer-gutter) + var(--outer-edge-fade)));
+    mask-size:
+      calc(var(--outer-gutter) + var(--outer-corner)) var(--outer-corner),
+      calc(var(--outer-gutter) + var(--outer-corner)) var(--outer-corner),
+      100% calc(100% - var(--outer-corner));
+    mask-position: left top, right top, center bottom;
+    mask-repeat: no-repeat;
+  }
+}
+
 
 /* ============================================================
    Q / EMBLEM PLACEHOLDER
