@@ -1,0 +1,255 @@
+diff --git a/src/corners.css b/src/corners.css
+index c89fb2b..8a64527 100644
+--- a/src/corners.css
++++ b/src/corners.css
+@@ -31,16 +31,35 @@
+   border-top-right-radius: 6px;
+ }
+ 
+-/* Only close a bottom curve once its surrounding color extends below it. */
+-.site-frame:has(.sticky-nav-link.is-current) .sticky-crown-core,
+-.site-frame:has(.sticky-nav-link.is-current) .sticky-item-brand {
++/* The scrolling originals must have the same curves as their fixed copies.
++   Paint only: do not clip the nested rays or change section measurements. */
++.frame {
++  border-bottom-left-radius: var(--corner-radius);
++  border-bottom-right-radius: var(--corner-radius);
++}
++
++.landing,
++.brand-gate {
+   border-bottom-left-radius: 6px;
+   border-bottom-right-radius: 6px;
+ }
+ 
+-.site-frame:has(.sticky-nav-link-about.is-current, .sticky-nav-link-listen.is-current, .sticky-nav-link-contact.is-current) .sticky-ray-gigs,
+-.site-frame:has(.sticky-nav-link-listen.is-current, .sticky-nav-link-contact.is-current) .sticky-ray-about,
+-.site-frame:has(.sticky-nav-link-contact.is-current) .sticky-ray-listen {
+-  border-bottom-left-radius: var(--corner-radius);
+-  border-bottom-right-radius: var(--corner-radius);
++/* A frame's last section paints its own background. Keep that background
++   inside the parent's curve without applying overflow clipping to the frame. */
++.frame > .content-section:last-child {
++  border-bottom-left-radius: calc(var(--corner-radius) - var(--frame-step));
++  border-bottom-right-radius: calc(var(--corner-radius) - var(--frame-step));
++}
++
++/* Reveal curves with the surrounding band, not the active-tab threshold.
++   No CSS transition: geometry must track scrolling in both directions. */
++.sticky-crown-core,
++.sticky-item-brand {
++  border-bottom-left-radius: calc(6px * var(--corner-progress, 0));
++  border-bottom-right-radius: calc(6px * var(--corner-progress, 0));
++}
++
++.sticky-ray {
++  border-bottom-left-radius: calc(var(--corner-radius) * var(--corner-progress, 0));
++  border-bottom-right-radius: calc(var(--corner-radius) * var(--corner-progress, 0));
+ }
+diff --git a/src/main.js b/src/main.js
+index f4132e8..3c9c18b 100644
+--- a/src/main.js
++++ b/src/main.js
+@@ -1,5 +1,6 @@
+ import './site-content.js'
+ import './contact.css'
++import { stickyClosureDepth, stickyCornerProgress } from './sticky-geometry.js'
+ 
+ /* ============================================================
+    QUATERNITY — PERSISTENT PRIMARY NAVIGATION
+@@ -589,56 +590,22 @@ if (
+       stackBottom
+ 
+ 
+-    /*
+-      Count how many section frames have reached the persistent
+-      crown.
+-
+-      Each caught section adds one complete frame thickness to
+-      the nested closure beneath the navigation.
+-
+-      The catch line moves downward as those frame closures
+-      accumulate.
+-    */
+-    let ghostCount =
+-      0
+-
+-
+-    if (navigationIsActive) {
+-
+-      sectionOrder.forEach(
+-        (sectionName) => {
+-
+-          const section =
+-            contentSectionByName.get(
+-              sectionName
+-            )
+-
+-
+-          if (!section) {
+-            return
+-          }
+-
+-
+-          const sectionRect =
+-            section.getBoundingClientRect()
+-
+-
+-          const catchLine =
+-            crownBottom
+-            + (
+-              ghostCount
+-              * ghostHeight
+-            )
+-
+-
+-          if (sectionRect.top <= catchLine) {
+-            ghostCount += 1
+-          }
+-
+-        }
+-      )
++    // Follow the moving section edge continuously. Adding a whole band
++    // at once caused a visible step at the fixed/scrolling paint boundary.
++    const closureDepth = navigationIsActive
++      ? stickyClosureDepth(
++          sectionOrder.map((name) =>
++            contentSectionByName.get(name)?.getBoundingClientRect().top
++              ?? Infinity
++          ),
++          crownBottom,
++          ghostHeight,
++        )
++      : 0
+ 
+-    }
++    const crownCurve = stickyCornerProgress(closureDepth, 0, ghostHeight)
++    stickyCrownCore.style.setProperty('--corner-progress', crownCurve)
++    brandSticky?.style.setProperty('--corner-progress', crownCurve)
+ 
+ 
+     /*
+@@ -647,10 +614,7 @@ if (
+     */
+     stackBottom =
+       crownBottom
+-      + (
+-        ghostCount
+-        * ghostHeight
+-      )
++      + closureDepth
+ 
+ 
+     /*
+@@ -715,21 +679,23 @@ if (
+           )
+ 
+ 
+-        const retainedRows =
++        const retainedDepth =
+           rayIndex >= 0
+             ? Math.min(
+-                ghostCount,
+-                rayIndex + 1
++                closureDepth,
++                (rayIndex + 1) * ghostHeight
+               )
+             : 0
+ 
+ 
+         const rayBottom =
+           crownBottom
+-          + (
+-            retainedRows
+-            * ghostHeight
+-          )
++          + retainedDepth
++
++        stickyRay.style.setProperty(
++          '--corner-progress',
++          stickyCornerProgress(closureDepth, retainedDepth, ghostHeight),
++        )
+ 
+ 
+         stickyRay.style.height =
+diff --git a/src/sticky-geometry.js b/src/sticky-geometry.js
+new file mode 100644
+index 0000000..d4376c8
+--- /dev/null
++++ b/src/sticky-geometry.js
+@@ -0,0 +1,12 @@
++// Reveal each retained band over one frame thickness, not in a single jump.
++// Section positions and the crown edge are both viewport coordinates.
++export function stickyClosureDepth(sectionTops, crownBottom, frameStep) {
++  return sectionTops.reduce((depth, top, index) => depth + Math.max(
++    0,
++    Math.min(frameStep, crownBottom + (index + 1) * frameStep - top),
++  ), 0)
++}
++
++export function stickyCornerProgress(depth, bandBottom, frameStep) {
++  return Math.max(0, Math.min(1, (depth - bandBottom) / frameStep))
++}
+diff --git a/tests/sticky-geometry.test.js b/tests/sticky-geometry.test.js
+new file mode 100644
+index 0000000..3512e2f
+--- /dev/null
++++ b/tests/sticky-geometry.test.js
+@@ -0,0 +1,57 @@
++import assert from 'node:assert/strict'
++import test from 'node:test'
++import { stickyClosureDepth, stickyCornerProgress } from '../src/sticky-geometry.js'
++
++for (const gap of [6, 12]) {
++  const crown = 241.375
++  const topsAt = (index, top) => Array.from({ length: 4 }, (_, i) =>
++    i < index ? -1000 : i === index ? top : 10000
++  )
++
++  test(`${gap}px frames: each closure is continuous, reversible and bounded`, () => {
++    for (let index = 0; index < 4; index++) {
++      const catchLine = crown + index * gap
++      const samples = []
++      for (let distance = gap + 1; distance >= -1; distance -= 0.125) {
++        const top = catchLine + distance
++        const depth = stickyClosureDepth(topsAt(index, top), crown, gap)
++        const expected = index * gap + Math.max(0, Math.min(gap, gap - distance))
++        assert.equal(depth, expected)
++        const previous = samples.at(-1)
++        if (previous) assert.ok(Math.abs(depth - previous.depth) <= 0.125)
++        samples.push({ top, depth })
++        for (let band = 1; band <= 4; band++) {
++          const retained = Math.min(depth, band * gap)
++          const progress = stickyCornerProgress(depth, retained, gap)
++          assert.ok(progress >= 0 && progress <= 1)
++          if (retained === depth) assert.equal(progress, 0)
++        }
++      }
++      for (const { top, depth } of samples.reverse()) {
++        assert.equal(stickyClosureDepth(topsAt(index, top), crown, gap), depth)
++      }
++    }
++  })
++
++  test(`${gap}px frames: settled section stops retain original band heights`, () => {
++    for (let index = 0; index < 4; index++) {
++      const depth = stickyClosureDepth(topsAt(index, crown + index * gap - 1), crown, gap)
++      assert.equal(depth, (index + 1) * gap)
++      assert.equal(stickyCornerProgress(depth, 0, gap), 1)
++      for (let band = 1; band <= 4; band++) {
++        assert.equal(Math.min(depth, band * gap), Math.min(index + 1, band) * gap)
++      }
++    }
++  })
++}
++
++test('absent sections do not introduce a closure or NaN', () => {
++  assert.equal(stickyClosureDepth([Infinity, Infinity, Infinity, Infinity], 240, 12), 0)
++})
++
++test('corner reveal is continuous across both ends of a band', () => {
++  assert.equal(stickyCornerProgress(12, 12, 12), 0)
++  assert.equal(stickyCornerProgress(18, 12, 12), 0.5)
++  assert.equal(stickyCornerProgress(24, 12, 12), 1)
++  assert.equal(stickyCornerProgress(48, 12, 12), 1)
++})

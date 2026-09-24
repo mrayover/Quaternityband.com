@@ -1,5 +1,6 @@
 import './site-content.js'
 import './contact.css'
+import { stickyClosureDepth, stickyCornerProgress } from './sticky-geometry.js'
 
 /* ============================================================
    QUATERNITY — PERSISTENT PRIMARY NAVIGATION
@@ -589,56 +590,22 @@ if (
       stackBottom
 
 
-    /*
-      Count how many section frames have reached the persistent
-      crown.
+    // Follow the moving section edge continuously. Adding a whole band
+    // at once caused a visible step at the fixed/scrolling paint boundary.
+    const closureDepth = navigationIsActive
+      ? stickyClosureDepth(
+          sectionOrder.map((name) =>
+            contentSectionByName.get(name)?.getBoundingClientRect().top
+              ?? Infinity
+          ),
+          crownBottom,
+          ghostHeight,
+        )
+      : 0
 
-      Each caught section adds one complete frame thickness to
-      the nested closure beneath the navigation.
-
-      The catch line moves downward as those frame closures
-      accumulate.
-    */
-    let ghostCount =
-      0
-
-
-    if (navigationIsActive) {
-
-      sectionOrder.forEach(
-        (sectionName) => {
-
-          const section =
-            contentSectionByName.get(
-              sectionName
-            )
-
-
-          if (!section) {
-            return
-          }
-
-
-          const sectionRect =
-            section.getBoundingClientRect()
-
-
-          const catchLine =
-            crownBottom
-            + (
-              ghostCount
-              * ghostHeight
-            )
-
-
-          if (sectionRect.top <= catchLine) {
-            ghostCount += 1
-          }
-
-        }
-      )
-
-    }
+    const crownCurve = stickyCornerProgress(closureDepth, 0, ghostHeight)
+    stickyCrownCore.style.setProperty('--corner-progress', crownCurve)
+    brandSticky?.style.setProperty('--corner-progress', crownCurve)
 
 
     /*
@@ -647,10 +614,7 @@ if (
     */
     stackBottom =
       crownBottom
-      + (
-        ghostCount
-        * ghostHeight
-      )
+      + closureDepth
 
 
     /*
@@ -715,21 +679,23 @@ if (
           )
 
 
-        const retainedRows =
+        const retainedDepth =
           rayIndex >= 0
             ? Math.min(
-                ghostCount,
-                rayIndex + 1
+                closureDepth,
+                (rayIndex + 1) * ghostHeight
               )
             : 0
 
 
         const rayBottom =
           crownBottom
-          + (
-            retainedRows
-            * ghostHeight
-          )
+          + retainedDepth
+
+        stickyRay.style.setProperty(
+          '--corner-progress',
+          stickyCornerProgress(closureDepth, retainedDepth, ghostHeight),
+        )
 
 
         stickyRay.style.height =

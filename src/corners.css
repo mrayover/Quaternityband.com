@@ -31,16 +31,30 @@
   border-top-right-radius: 6px;
 }
 
-/* Only close a bottom curve once its surrounding color extends below it. */
-.site-frame:has(.sticky-nav-link.is-current) .sticky-crown-core,
-.site-frame:has(.sticky-nav-link.is-current) .sticky-item-brand {
+/* Round the section surface, not its surrounding frame. The frame is the
+   next section's color and must continue straight down at both sides. */
+.landing,
+.brand-gate {
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
 }
 
-.site-frame:has(.sticky-nav-link-about.is-current, .sticky-nav-link-listen.is-current, .sticky-nav-link-contact.is-current) .sticky-ray-gigs,
-.site-frame:has(.sticky-nav-link-listen.is-current, .sticky-nav-link-contact.is-current) .sticky-ray-about,
-.site-frame:has(.sticky-nav-link-contact.is-current) .sticky-ray-listen {
-  border-bottom-left-radius: var(--corner-radius);
-  border-bottom-right-radius: var(--corner-radius);
+/* Each content surface owns its bottom corners. Its enclosing frame stays
+   square, so rounding Gigs cannot also round the orange About band, etc. */
+.frame > .content-section:last-child {
+  border-bottom-left-radius: calc(var(--corner-radius) - var(--frame-step));
+  border-bottom-right-radius: calc(var(--corner-radius) - var(--frame-step));
+}
+
+/* Reveal curves with the surrounding band, not the active-tab threshold.
+   No CSS transition: geometry must track scrolling in both directions. */
+.sticky-crown-core,
+.sticky-item-brand {
+  border-bottom-left-radius: calc(6px * var(--corner-progress, 0));
+  border-bottom-right-radius: calc(6px * var(--corner-progress, 0));
+}
+
+.sticky-ray {
+  border-bottom-left-radius: calc(var(--corner-radius) * var(--corner-progress, 0));
+  border-bottom-right-radius: calc(var(--corner-radius) * var(--corner-progress, 0));
 }

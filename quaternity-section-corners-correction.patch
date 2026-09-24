@@ -1,0 +1,28 @@
+--- a/src/corners.css
++++ b/src/corners.css
+@@ -31,21 +31,16 @@
+   border-top-right-radius: 6px;
+ }
+ 
+-/* The scrolling originals must have the same curves as their fixed copies.
+-   Paint only: do not clip the nested rays or change section measurements. */
+-.frame {
+-  border-bottom-left-radius: var(--corner-radius);
+-  border-bottom-right-radius: var(--corner-radius);
+-}
+-
++/* Round the section surface, not its surrounding frame. The frame is the
++   next section's color and must continue straight down at both sides. */
+ .landing,
+ .brand-gate {
+   border-bottom-left-radius: 6px;
+   border-bottom-right-radius: 6px;
+ }
+ 
+-/* A frame's last section paints its own background. Keep that background
+-   inside the parent's curve without applying overflow clipping to the frame. */
++/* Each content surface owns its bottom corners. Its enclosing frame stays
++   square, so rounding Gigs cannot also round the orange About band, etc. */
+ .frame > .content-section:last-child {
+   border-bottom-left-radius: calc(var(--corner-radius) - var(--frame-step));
+   border-bottom-right-radius: calc(var(--corner-radius) - var(--frame-step));
