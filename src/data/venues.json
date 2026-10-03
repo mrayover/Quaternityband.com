@@ -321,5 +321,16 @@
     "socialUrl": "https://www.instagram.com/the.howlin.wolf.fresno/?hl=en",
     "logo": "",
     "id": "venue_15695d30-59ab-40d7-8801-e30aae52f295"
+  },
+  {
+    "name": "First Christian Church - Selma Disciples",
+    "city": "Selma",
+    "address": "2026 Arrants St, Selma, CA 93662",
+    "mapLink": "https://maps.app.goo.gl/JN4kz4JuyuQEVBuW7",
+    "website": "https://www.selmadisciples.com/",
+    "socialType": "ig",
+    "socialUrl": "https://www.instagram.com/selmadisciples/",
+    "logo": "",
+    "id": "venue_136ac0bd-4e0b-438f-8a92-71081b881bdb"
   }
 ]

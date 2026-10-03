@@ -24,6 +24,18 @@
     "id": "evt_855b9e5a-3c72-45be-ad4d-d7bc7d02b15c"
   },
   {
+    "title": "First Christian Church Dinner Soiree",
+    "date": "2026-10-09",
+    "startTime": "18:30",
+    "endTime": "20:30",
+    "venueId": "venue_136ac0bd-4e0b-438f-8a92-71081b881bdb",
+    "details": "Come out to this lovely evening soiree with Selma Disciples! Tickets are required see link for purchase.",
+    "link": "https://www.zeffy.com/en-US/ticketing/evening-soiree",
+    "flyer": "/assets/Images/Writer/gigs/ChurchFundraiser-d20ff9af-5ca6-4ca3-b400-4d580c53c36f.jpg",
+    "status": "scheduled",
+    "id": "evt_b57c40c6-a6f5-4ec7-990f-4e9f0748a6c7"
+  },
+  {
     "title": "Quaternity @ Goldesteins",
     "date": "2026-10-15",
     "startTime": "21:00",
